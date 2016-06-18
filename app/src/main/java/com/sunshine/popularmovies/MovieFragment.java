@@ -49,7 +49,7 @@ public class MovieFragment extends Fragment {
             mMovieDataArrayList = new ArrayList<>(Collections.singletonList(mMovieData));
         }
         else {
-            mMovieDataArrayList = savedInstanceState.getParcelableArrayList("Movie data");
+            mMovieDataArrayList = savedInstanceState.getParcelableArrayList("Movie com.sunshine.popularmovies.data");
         }
         setHasOptionsMenu(true);
     }
@@ -131,7 +131,7 @@ public class MovieFragment extends Fragment {
 
             // Will contain the raw JSON response as a string.
             String movieJsonStr = null;
-            String appid = "Enter Your API Key";
+            String appid = "89d7f04f6c9ed1a948da0d08299b5afe";
 
 
             try {

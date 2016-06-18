@@ -30,6 +30,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".MainActivity"/>
         </activity>
+        <provider
+            android:authorities="com.sunshine.popularmovies"
+            android:name=".data.MovieProvider">
+        </provider>
+
     </application>
 
 
