@@ -24,23 +24,20 @@ public class MovieProvider extends ContentProvider {
     }
 
 
-
     //SQLite Query Builder
     private static final SQLiteQueryBuilder mSQLiteQueryBuilder;
 
-    static
-    {
+    static {
         mSQLiteQueryBuilder = new SQLiteQueryBuilder();
     }
 
     //movie.movie_id=?
     final String movieWithMovieId = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
-    public Cursor getMovieWithMovieId(Uri uri,String projection[],String sortOrder)
-    {
-        int movieId= MovieContract.MovieEntry.getMovieId(uri);
-        String selection= movieWithMovieId;
-        String selectionArgs[]=new String[]{String.valueOf(movieId)};
+    public Cursor getMovieWithMovieId(Uri uri, String projection[], String sortOrder) {
+        int movieId = MovieContract.MovieEntry.getMovieId(uri);
+        String selection = movieWithMovieId;
+        String selectionArgs[] = new String[]{String.valueOf(movieId)};
 
         return mSQLiteQueryBuilder.query(mMovieDbHelper.getWritableDatabase(),
                 projection,
@@ -66,8 +63,6 @@ public class MovieProvider extends ContentProvider {
     }
 
 
-
-
     @Override
     public boolean onCreate() {
         mMovieDbHelper = new MovieDbHelper(getContext());
@@ -79,12 +74,11 @@ public class MovieProvider extends ContentProvider {
     public Cursor query(@NonNull Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         Cursor cursor;
 
-        final int match= sUriMatcher.match(uri);
+        final int match = sUriMatcher.match(uri);
 
-        switch (match)
-        {
+        switch (match) {
             case MOVIE:
-                cursor= mMovieDbHelper.getReadableDatabase().query(
+                cursor = mMovieDbHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
                         projection,
                         selection,
@@ -94,12 +88,12 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
             case MOVIE_WITH_MOVIE_ID:
-                cursor= getMovieWithMovieId(uri,projection,sortOrder);
+                cursor = getMovieWithMovieId(uri, projection, sortOrder);
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown Uri: "+uri);
+                throw new UnsupportedOperationException("Unknown Uri: " + uri);
         }
-        cursor.setNotificationUri(getContext().getContentResolver(),uri);
+        cursor.setNotificationUri(getContext().getContentResolver(), uri);
 
         return cursor;
     }
@@ -121,37 +115,95 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert( Uri uri, ContentValues values) {
+    public Uri insert(Uri uri, ContentValues values) {
 
-        SQLiteDatabase db= mMovieDbHelper.getWritableDatabase();
-        final int match= sUriMatcher.match(uri);
+        SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
         Uri returnUri;
 
-        switch (match)
-        {
+        switch (match) {
             case MOVIE:
-                long _id= db.insert(MovieContract.MovieEntry.TABLE_NAME,null,values);
-                if (_id>0)
-                    returnUri= MovieContract.MovieEntry.buildMovieUri(_id);
+                long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, values);
+                if (_id > 0)
+                    returnUri = MovieContract.MovieEntry.buildMovieUri(_id);
                 else
-                    throw new SQLException("Unable to insert into "+uri);
+                    throw new SQLException("Unable to insert into " + uri);
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown Uri: "+uri);
+                throw new UnsupportedOperationException("Unknown Uri: " + uri);
 
         }
-        getContext().getContentResolver().notifyChange(uri,null);
+        getContext().getContentResolver().notifyChange(uri, null);
 
         return returnUri;
     }
 
     @Override
     public int delete(@NonNull Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        long rowDeleted;
+        if (selection == null) selection = "1";
+        switch (match) {
+            case MOVIE:
+                rowDeleted = db.delete(MovieContract.MovieEntry.TABLE_NAME, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unable to delete: " + uri);
+
+        }
+        if (rowDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+
+        }
+        return (int) rowDeleted;
     }
 
     @Override
     public int update(@NonNull Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+
+        SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        long rowUpdated = 0;
+
+        switch (match) {
+            case MOVIE:
+                rowUpdated = db.update(MovieContract.MovieEntry.TABLE_NAME, values, selection, selectionArgs);
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown Uri " + uri);
+        }
+        if (rowUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+
+        }
+        return (int) rowUpdated;
+    }
+
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
+        final int match = sUriMatcher.match(uri);
+        switch (match) {
+            case MOVIE:
+                db.beginTransaction();
+                int returnCount = 0;
+                try {
+                    for (ContentValues contentValues : values) {
+                        long _id = db.insert(MovieContract.MovieEntry.TABLE_NAME, null, contentValues);
+                        if (_id != 0)
+                            returnCount++;
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                getContext().getContentResolver().notifyChange(uri,null);
+                return returnCount;
+            default:
+                return super.bulkInsert(uri, values);
+
+
+        }
     }
 }

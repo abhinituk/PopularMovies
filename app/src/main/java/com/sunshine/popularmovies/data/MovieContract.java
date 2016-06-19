@@ -64,9 +64,9 @@ public class MovieContract {
             return ContentUris.withAppendedId(CONTENT_URI,id);
         }
 
-        public static Uri buildMovieWithMovieIdUri(String movie_id)
+        public static Uri buildMovieWithMovieIdUri(int movie_id)
         {
-            return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_MOVIE_ID, movie_id).build();
+            return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_MOVIE_ID, String.valueOf(movie_id)).build();
         }
 
         public static int getMovieId(Uri uri)
@@ -75,14 +75,4 @@ public class MovieContract {
         }
 
     }
-
-//    public static final class MovieDetailEntry implements BaseColumns
-//    {
-//        public static final String TABLE_NAME="detail";
-//
-//        //Column with the foreign key in MovieDetail table
-//        public static final String COLUMN_MOVIE_DETAIL_KEY="movie_row_id";
-//
-//
-//    }
 }

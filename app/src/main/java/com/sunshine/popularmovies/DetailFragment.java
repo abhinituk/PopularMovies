@@ -63,7 +63,7 @@ public class DetailFragment extends Fragment{
             ((TextView) rootView.findViewById(R.id.detail_title)).setText(movieData.title);
             ((TextView) rootView.findViewById(R.id.detail_overview)).setText(movieData.overview);
             ((TextView) rootView.findViewById(R.id.detail_release_date)).setText(movieData.release_date);
-            ((TextView) rootView.findViewById(R.id.detail_vote_average)).setText(movieData.vote_average);
+            ((TextView) rootView.findViewById(R.id.detail_vote_average)).setText((int) movieData.vote_average);
             ImageView movie_poster= (ImageView) rootView.findViewById(R.id.detail_image_view);
             Picasso.with(getActivity()).load(movieData.ImageUrl).into(movie_poster);
         }
