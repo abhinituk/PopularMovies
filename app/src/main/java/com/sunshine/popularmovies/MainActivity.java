@@ -9,7 +9,6 @@ import android.view.MenuItem;
 import com.facebook.stetho.Stetho;
 
 public class MainActivity extends AppCompatActivity {
-    private final String FRAGMENT_TAG="MMTAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

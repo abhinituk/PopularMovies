@@ -112,7 +112,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     }
 
 
-    private ArrayList<MovieData> getMovieDatafromJson(String movieJsonStr) throws JSONException {
+    private void getMovieDatafromJson(String movieJsonStr) throws JSONException {
 
         final String TMDB_POSTER_PATH = "poster_path";
         final String TMDB_OVERVIEW = "overview";
@@ -176,7 +176,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
                     } while (cursor.moveToNext());
                 }
                 Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVector.size() + " Inserted");
-                mMovieDataArrayList= convertValuesToMovieDataObject(cVector);
+//                mMovieDataArrayList= convertValuesToMovieDataObject(cVector);
 
 
 
@@ -185,31 +185,30 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
                 Log.e("Internet Connectivity", "Enable Data Connection");
             }
         }
-        return mMovieDataArrayList;
     }
 
-    public static ArrayList<MovieData> convertValuesToMovieDataObject(Vector<ContentValues> cv) {
-        ArrayList<MovieData> arrayList = new ArrayList<>(cv.size());
-
-        for (int i = 0; i < cv.size(); i++) {
-            ContentValues movieValue = cv.elementAt(i);
-
-            int movieId= movieValue.getAsInteger(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
-            String title= movieValue.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE);
-            String overview= movieValue.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW);
-            String posterpath = movieValue.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH);
-            double popularity = movieValue.getAsDouble(MovieContract.MovieEntry.COLUMN_MOVIE_POPULARITY);
-            double vote_count= movieValue.getAsDouble(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_COUNT);
-            double vote_avg= movieValue.getAsDouble(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVG);
-            String releaseDate= movieValue.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE);
-
-            mMovieData= new MovieData(title,overview,vote_avg,releaseDate,posterpath,movieId,popularity,vote_count);
-            arrayList.add(mMovieData);
-
-
-        }
-        return arrayList;
-    }
+//    public static ArrayList<MovieData> convertValuesToMovieDataObject(Vector<ContentValues> cv) {
+//        ArrayList<MovieData> arrayList = new ArrayList<>(cv.size());
+//
+//        for (int i = 0; i < cv.size(); i++) {
+//            ContentValues movieValue = cv.elementAt(i);
+//
+//            int movieId= movieValue.getAsInteger(MovieContract.MovieEntry.COLUMN_MOVIE_ID);
+//            String title= movieValue.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE);
+//            String overview= movieValue.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW);
+//            String posterpath = movieValue.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH);
+//            double popularity = movieValue.getAsDouble(MovieContract.MovieEntry.COLUMN_MOVIE_POPULARITY);
+//            double vote_count= movieValue.getAsDouble(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_COUNT);
+//            double vote_avg= movieValue.getAsDouble(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVG);
+//            String releaseDate= movieValue.getAsString(MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE);
+//
+//            mMovieData= new MovieData(title,overview,vote_avg,releaseDate,posterpath,movieId,popularity,vote_count);
+//            arrayList.add(mMovieData);
+//
+//
+//        }
+//        return arrayList;
+//    }
 
 //    private long addMovie(int movieId,String title,String overview,String posterPath,
 //                          double popularity,double voteCount,double voteAvg,String releaseDate )
