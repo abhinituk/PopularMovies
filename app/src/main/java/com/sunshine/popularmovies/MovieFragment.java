@@ -1,10 +1,16 @@
 package com.sunshine.popularmovies;
 
 
-import android.app.Fragment;
+import android.annotation.TargetApi;
+import android.database.Cursor;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -13,14 +19,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import com.sunshine.popularmovies.data.MovieContract;
+
 import java.util.ArrayList;
 import java.util.Collections;
 
 
-public class MovieFragment extends Fragment {
+public class MovieFragment extends android.support.v4.app.Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private CustomMovieAdapter mCustomMovieAdapter;
-
-
+    private static final int LOADER_ID = 0;
     static GridView gridView;
     ArrayList<MovieData> mMovieDataArrayList;
 
@@ -88,6 +95,26 @@ public class MovieFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         gridView = (GridView) rootView.findViewById(R.id.grid_view_fragment);
+        Cursor cur = getActivity().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+        assert cur != null;
+        if(cur.moveToFirst())
+        {
+            String firstRow= cur.getString(cur.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE));
+            Log.v("Cursor",firstRow);
+            while (cur.moveToNext())
+            {
+                String row= cur.getString(cur.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE));
+                Log.v("Cursor",row);
+            }
+        }
+
+
+        mCustomMovieAdapter= new CustomMovieAdapter(getActivity(),cur,0);
+        gridView.setAdapter(mCustomMovieAdapter);
 //        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -109,5 +136,33 @@ public class MovieFragment extends Fragment {
         return rootView;
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        getLoaderManager().initLoader(LOADER_ID, null, this);
+        super.onActivityCreated(savedInstanceState);
 
+    }
+
+    @TargetApi(Build.VERSION_CODES.M)
+    @Override
+    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+
+        return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
+                null,
+                null,
+                null,
+                null);
+    }
+
+
+    @Override
+    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        mCustomMovieAdapter.swapCursor(data);
+    }
+
+    @Override
+    public void onLoaderReset(Loader<Cursor> loader) {
+        mCustomMovieAdapter.swapCursor(null);
+    }
 }

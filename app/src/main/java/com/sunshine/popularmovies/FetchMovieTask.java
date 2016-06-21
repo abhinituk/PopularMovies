@@ -8,7 +8,6 @@ import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.sunshine.popularmovies.data.MovieContract;
 
@@ -25,10 +24,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
 
-/**
- * Created by Abhishek on 19-06-2016.
- */
-public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData>> {
+
+public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
     ArrayList<MovieData> mMovieDataArrayList;
@@ -41,7 +38,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData>
     }
 
     @Override
-    protected ArrayList<MovieData> doInBackground(String... params) {
+    protected Void doInBackground(String... params) {
         // These two need to be declared outside the try/catch
         // so that they can be closed in the finally block.
         HttpURLConnection urlConnection = null;
@@ -106,7 +103,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData>
             }
         }
         try {
-            return getMovieDatafromJson(movieJsonStr);
+            getMovieDatafromJson(movieJsonStr);
         } catch (Exception e) {
             Log.e("Error", e.getMessage(), e);
             e.printStackTrace();
@@ -250,18 +247,18 @@ public class FetchMovieTask extends AsyncTask<String, Void, ArrayList<MovieData>
 //    }
 
 
-    @Override
-    protected void onPostExecute(ArrayList<MovieData> strings) {
-        if (strings != null) {
-            if (mContext != null)//http://stackoverflow.com/questions/28414480/android-nullpointerexception-from-creating-an-adapter
-            {
-                mCustomMovieAdapter = new CustomMovieAdapter(mContext, strings);
-                MovieFragment.gridView.setAdapter(mCustomMovieAdapter);
-                mCustomMovieAdapter.notifyDataSetChanged();
-            }
-        } else {
-            Toast.makeText(mContext, "Something Went Wrong...Check Your Internet Connection & Try Again", Toast.LENGTH_LONG).show();
-        }
-    }
+//    @Override
+//    protected void onPostExecute(ArrayList<MovieData> strings) {
+//        if (strings != null) {
+//            if (mContext != null)//http://stackoverflow.com/questions/28414480/android-nullpointerexception-from-creating-an-adapter
+//            {
+//                mCustomMovieAdapter = new CustomMovieAdapter(get);
+//                MovieFragment.gridView.setAdapter(mCustomMovieAdapter);
+//                mCustomMovieAdapter.notifyDataSetChanged();
+//            }
+//        } else {
+//            Toast.makeText(mContext, "Something Went Wrong...Check Your Internet Connection & Try Again", Toast.LENGTH_LONG).show();
+//        }
+//    }
 }
 

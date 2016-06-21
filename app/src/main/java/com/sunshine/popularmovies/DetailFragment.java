@@ -1,9 +1,10 @@
 package com.sunshine.popularmovies;
 
-import android.app.Fragment;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -18,7 +19,7 @@ import com.squareup.picasso.Picasso;
 /**
  * Created by Abhishek on 13-05-2016.
  */
-public class DetailFragment extends Fragment{
+public class DetailFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

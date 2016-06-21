@@ -5,7 +5,9 @@ import android.widget.ImageView;
 /**
  * Created by Abhishek on 14-05-2016.
  */
-public class PosterImageViewHolder {
+public class PosterImageViewHolder  {
 
-    ImageView poster;
+     ImageView poster;
+
+
 }

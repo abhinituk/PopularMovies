@@ -1,6 +1,5 @@
 package com.sunshine.popularmovies;
 
-import android.app.FragmentManager;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -10,14 +9,15 @@ import android.view.MenuItem;
 import com.facebook.stetho.Stetho;
 
 public class MainActivity extends AppCompatActivity {
+    private final String FRAGMENT_TAG="MMTAG";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if(savedInstanceState == null) {
-            FragmentManager fragmentManager=getFragmentManager();
-            fragmentManager.beginTransaction().add(R.id.container,new MovieFragment()).commit();
+
+            getSupportFragmentManager().beginTransaction().add(R.id.container,new MovieFragment()).commit();
 
         }
         Stetho.initializeWithDefaults(this);
