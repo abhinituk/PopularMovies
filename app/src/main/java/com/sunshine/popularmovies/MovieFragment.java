@@ -2,29 +2,41 @@ package com.sunshine.popularmovies;
 
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.GridView;
 
 import com.sunshine.popularmovies.data.MovieContract;
 
 
-public class MovieFragment extends android.support.v4.app.Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public  class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    String DETAIL_URI="URI";
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
     static GridView gridView;
+
+    private static final String[] MOVIE_COLUMN= {MovieContract.MovieEntry._ID
+                                                    , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
+                                                    , MovieContract.MovieEntry.COLUMN_MOVIE_ID};
+    static final int COL_ID=0;
+    static final int COL_POSTER_PATH=1;
+    static final int COL_MOVIE_ID=2;
 
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.
@@ -42,7 +54,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Lo
     @Override
     public void onSaveInstanceState(Bundle outState) {
 //        outState.putParcelableArrayList("Movie Data", mMovieDataArrayList);
-//        super.onSaveInstanceState(outState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -84,12 +96,26 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Lo
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-
         gridView = (GridView) rootView.findViewById(R.id.grid_view_fragment);
-
-
         mCustomMovieAdapter = new CustomMovieAdapter(getActivity(), null, 0);
         gridView.setAdapter(mCustomMovieAdapter);
+
+        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
+                if(cursor!=null)
+                {
+                    Intent intent= new Intent(getActivity(),DetailActivity.class)
+                            .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri(cursor.getInt(COL_MOVIE_ID)));
+
+                    Log.v("Movie ID", String.valueOf(cursor.getInt(COL_MOVIE_ID)));
+                    startActivity(intent);
+                }
+            }
+        });
+
+
         return rootView;
     }
 
@@ -106,7 +132,7 @@ public class MovieFragment extends android.support.v4.app.Fragment implements Lo
 
 
         return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
-                null,
+                MOVIE_COLUMN,
                 null,
                 null,
                 null);

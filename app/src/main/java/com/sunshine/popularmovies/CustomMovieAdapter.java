@@ -9,9 +9,9 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.sunshine.popularmovies.data.MovieContract;
 
 public class CustomMovieAdapter extends CursorAdapter {
+
 
     public CustomMovieAdapter(Context context, Cursor cursor, int flags) {
         super(context, cursor, flags);
@@ -43,56 +43,70 @@ public class CustomMovieAdapter extends CursorAdapter {
     @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
 
-        //        PosterImageViewHolder viewHolder = new PosterImageViewHolder();
-//        viewHolder.poster = (ImageView) view.findViewById(R.id.grid_item_imageview);
-//        view.setTag(viewHolder);
-        return LayoutInflater.from(mContext).inflate(R.layout.grid_item_movies, parent, false);
+        View view = LayoutInflater.from(mContext).inflate(R.layout.grid_item_movies, parent, false);
+        ViewHolder holder = new ViewHolder(view);
+        view.setTag(holder);
+
+        return view;
     }
 
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        ImageView poster= (ImageView) view.findViewById(R.id.grid_item_imageview);
-//        PosterImageViewHolder viewHolder = (PosterImageViewHolder) view.getTag();
-        String posterPath= cursor.getString(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
+        ViewHolder holder = (ViewHolder) view.getTag();
 
-
-//         Target target = new Target() {
+        String posterPath = cursor.getString(MovieFragment.COL_POSTER_PATH);
+//        Target target = new Target() {
 //            @Override
 //            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
 //                new Thread(new Runnable() {
 //                    @Override
 //                    public void run() {
-//
-//                        File file = new File(
-//                                Environment.getExternalStorageDirectory().getPath()
-//                                        + "/saved.jpg");
-//                        try {
-//                            file.createNewFile();
-//                            FileOutputStream ostream = new FileOutputStream(file);
-//                            bitmap.compress(Bitmap.CompressFormat.JPEG,100,ostream);
-//                            ostream.close();
+//                        File directory = new File(Environment.getExternalStorageDirectory() + "/Images");
+//                        if (!directory.exists()) {
+//                            directory.mkdir();
 //                        }
-//                        catch (Exception e) {
+//                        try {
+//                            directory.createNewFile();
+//                            FileOutputStream outputStream = new FileOutputStream(directory);
+//                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+//                            outputStream.close();
+//                        } catch (IOException e) {
 //                            e.printStackTrace();
 //                        }
+//
 //                    }
 //                }).start();
+//
 //            }
 //
 //            @Override
-//            public void onBitmapFailed(Drawable errorDrawable) {}
+//            public void onBitmapFailed(Drawable errorDrawable) {
+//
+//            }
 //
 //            @Override
-//            public void onPrepareLoad(Drawable placeHolderDrawable) {}
+//            public void onPrepareLoad(Drawable placeHolderDrawable) {
+//
+//            }
 //        };
+
+
         Picasso.with(mContext)
                 .load(posterPath)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder_error)
-                .into(poster);
+                .into(holder.poster);
 
     }
 
+    public static class ViewHolder {
+        final ImageView poster;
+
+        ViewHolder(View view) {
+            poster = (ImageView) view.findViewById(R.id.grid_item_imageview);
+        }
+
+    }
 
 
 }

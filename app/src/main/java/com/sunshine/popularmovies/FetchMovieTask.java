@@ -21,16 +21,12 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.Vector;
 
 
 public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-    ArrayList<MovieData> mMovieDataArrayList;
-    static MovieData mMovieData;
-    private CustomMovieAdapter mCustomMovieAdapter;
     private Context mContext;
 
     public FetchMovieTask(Activity activity) {
