@@ -62,6 +62,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/vote" />
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/trailer_list_view"
+            android:layout_below="@+id/detail_vote_average"/>
+
+        <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/review_list_view"
+            android:layout_below="@id/trailer_list_view"/>
+
 
 
     </RelativeLayout>

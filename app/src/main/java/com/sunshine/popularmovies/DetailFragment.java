@@ -17,11 +17,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.sunshine.popularmovies.data.MovieContract;
+
+import java.util.ArrayList;
 
 /**
  * Created by Abhishek on 13-05-2016.
@@ -29,6 +33,8 @@ import com.sunshine.popularmovies.data.MovieContract;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final int LOADER_ID = 1;
+    static ArrayList<String> mArrayListTrailer;
+    static ArrayList<String> mArrayListReview;
 
     private static String[] DETAIL_COLUMN = {
             MovieContract.MovieEntry._ID,
@@ -69,14 +75,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onStart() {
         super.onStart();
-        updateTrailersAndReviews();
+        updateTrailer();
+        updateReview();
     }
 
-    public void updateTrailersAndReviews()
-    {
-        int movieId= MovieContract.MovieEntry.getMovieId(mUri);
-        FetchVideosAndReviewsTask videosAndReviewsTask= new FetchVideosAndReviewsTask();
-        videosAndReviewsTask.execute(movieId);
+
+    public void updateTrailer() {
+        FetchTrailerTask fetchTrailerTask = new FetchTrailerTask();
+        fetchTrailerTask.execute(269149);
+    }
+
+    public void updateReview() {
+        FetchReviewTask fetchReviewTask = new FetchReviewTask();
+        fetchReviewTask.execute(269149);
     }
 
     @Override
@@ -99,19 +110,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mUri= getActivity().getIntent().getData();
-        return inflater.inflate(R.layout.fragment_detail, container, false);
+        mUri = getActivity().getIntent().getData();
+        View view = inflater.inflate(R.layout.fragment_detail, container, false);
+
+
+        return view;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        if(null!=mUri)
+        if (null != mUri)
             return new CursorLoader(getActivity(),
-                mUri,
-                DETAIL_COLUMN,
-                null,
-                null,
-                null);
+                    mUri,
+                    DETAIL_COLUMN,
+                    null,
+                    null,
+                    null);
         else
             return null;
 
@@ -137,6 +151,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         TextView mReleaseDate = (TextView) getView().findViewById(R.id.detail_release_date);
         TextView mVoteAvg = (TextView) getView().findViewById(R.id.detail_vote_average);
 
+        ListView trailerListView = (ListView) getView().findViewById(R.id.trailer_list_view);
+        ListView reviewListView = (ListView) getView().findViewById(R.id.review_list_view);
+
 
         //DetailViewHolder holder= (DetailViewHolder) getView().getTag();
         Log.v("Title", title);
@@ -151,6 +168,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder_error)
                 .into(mPoster);
+        if (mArrayListTrailer != null && mArrayListReview != null) {
+            ArrayAdapter<String> trailerAdapter = new ArrayAdapter<>(getContext(),
+                    R.layout.fragment_detail,
+                    R.id.list_item_trailer_textView,
+                    mArrayListTrailer);
+            trailerListView.setAdapter(trailerAdapter);
+            ArrayAdapter<String> reviewAdapter = new ArrayAdapter<>(getContext(),
+                    R.layout.fragment_detail,
+                    R.id.list_item_review_textView,
+                    mArrayListReview);
+
+            reviewListView.setAdapter(reviewAdapter);
+        }
     }
 
     @Override

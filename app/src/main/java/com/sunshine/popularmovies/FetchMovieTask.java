@@ -148,8 +148,6 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POPULARITY, popularity);
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_COUNT, vote_count);
                     cVector.add(movieValues);
-
-
                 }
                 if (cVector.size() > 0) {
                     ContentValues[] cvArray = new ContentValues[cVector.size()];
