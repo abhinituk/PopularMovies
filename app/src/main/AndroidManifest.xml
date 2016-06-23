@@ -33,10 +33,16 @@
         </activity>
         <provider
             android:authorities="com.sunshine.popularmovies"
-            android:name=".data.MovieProvider">
+            android:name=".data.MovieProvider"
+            android:enabled="true"
+            android:exported="true"
+            android:permission="com.sunshine.popularmovies.LICENSE_TO_KILL">
         </provider>
 
     </application>
+    <permission android:name="com.sunshine.popularmovies.LICENSE_TO_KILL"
+        android:protectionLevel="dangerous"
+        android:label="Licensed to Kill"/>
 
 
 </manifest>

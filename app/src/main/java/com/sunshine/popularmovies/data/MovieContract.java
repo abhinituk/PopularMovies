@@ -66,7 +66,7 @@ public class MovieContract {
 
         public static Uri buildMovieWithMovieIdUri(int movie_id)
         {
-            return CONTENT_URI.buildUpon().appendQueryParameter(COLUMN_MOVIE_ID, String.valueOf(movie_id)).build();
+            return CONTENT_URI.buildUpon().appendPath(String.valueOf(movie_id)).build();
         }
 
         public static int getMovieId(Uri uri)

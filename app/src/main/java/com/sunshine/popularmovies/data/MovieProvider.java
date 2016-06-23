@@ -29,17 +29,18 @@ public class MovieProvider extends ContentProvider {
 
     static {
         mSQLiteQueryBuilder = new SQLiteQueryBuilder();
+        mSQLiteQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
     }
 
     //movie.movie_id=?
-    final String movieWithMovieId = MovieContract.MovieEntry.TABLE_NAME + "." + MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
+    final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
     public Cursor getMovieWithMovieId(Uri uri, String projection[], String sortOrder) {
         int movieId = MovieContract.MovieEntry.getMovieId(uri);
         String selection = movieWithMovieId;
         String selectionArgs[] = new String[]{String.valueOf(movieId)};
 
-        return mSQLiteQueryBuilder.query(mMovieDbHelper.getWritableDatabase(),
+        return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
                 projection,
                 selection,
                 selectionArgs,

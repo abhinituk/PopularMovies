@@ -67,6 +67,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     @Override
+    public void onStart() {
+        super.onStart();
+        updateTrailersAndReviews();
+    }
+
+    public void updateTrailersAndReviews()
+    {
+        int movieId= MovieContract.MovieEntry.getMovieId(mUri);
+        FetchVideosAndReviewsTask videosAndReviewsTask= new FetchVideosAndReviewsTask();
+        videosAndReviewsTask.execute(movieId);
+    }
+
+    @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.detail, menu);
         super.onCreateOptionsMenu(menu, inflater);
@@ -86,21 +99,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        mUri= getActivity().getIntent().getData();
         return inflater.inflate(R.layout.fragment_detail, container, false);
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Intent intent = getActivity().getIntent();
-        if (intent == null)
-            return null;
-
-        return new CursorLoader(getActivity(),
-                intent.getData(),
+        if(null!=mUri)
+            return new CursorLoader(getActivity(),
+                mUri,
                 DETAIL_COLUMN,
                 null,
                 null,
                 null);
+        else
+            return null;
 
 
     }
