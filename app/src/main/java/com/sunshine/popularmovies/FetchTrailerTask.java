@@ -1,10 +1,14 @@
 package com.sunshine.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+
+import com.sunshine.popularmovies.data.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,17 +21,18 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * Created by Abhishek on 23-06-2016.
  */
 public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>> {
 
-    ArrayList<String> mArrayListTrailer=new ArrayList<>();
+    ArrayList<String> mArrayListTrailer = new ArrayList<>();
     Context mContext;
 
     public FetchTrailerTask(Context context) {
-        this.mContext=context;
+        this.mContext = context;
     }
 
     @Override
@@ -69,9 +74,8 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
             Log.v("Trailer Json Data", jsonString);
         } catch (IOException e) {
             e.printStackTrace();
-        }
-        finally {
-            if(urlConnection!=null)
+        } finally {
+            if (urlConnection != null)
                 urlConnection.disconnect();
             if (reader != null) {
                 try {
@@ -82,14 +86,14 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
             }
         }
         try {
-            return getTrailerDataFromJson(jsonString,params[0]);
+            getTrailerDataFromJson(jsonString, params[0]);
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;
     }
 
-    public ArrayList<String> getTrailerDataFromJson(String jsonString, int movieId) throws JSONException {
+    public void getTrailerDataFromJson(String jsonString, int movieId) throws JSONException {
         final String TMDB_TRAILER_RESULTS = "results";
         final String TMDB_TRAILER_KEY = "key";
         final String TMDB_TRAILER_NAME = "name";
@@ -98,32 +102,48 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
 
             JSONObject object = new JSONObject(jsonString);
             JSONArray result = object.getJSONArray(TMDB_TRAILER_RESULTS);
+
+            Vector<ContentValues> valuesVector = new Vector<>(result.length());
+
             for (int i = 0; i < result.length(); i++) {
                 JSONObject trailer = result.getJSONObject(i);
                 String key = "https://www.youtube.com/watch?v=" + trailer.getString(TMDB_TRAILER_KEY);
                 String name = trailer.getString(TMDB_TRAILER_NAME);
 
-                String trailerData= key+"\n"+name;
+                ContentValues values = new ContentValues();
+                values.put(MovieContract.TrailerEntry.COL_TRAILER_ID, movieId);
+                values.put(MovieContract.TrailerEntry.COL_TRAILER_NAME, name);
+                values.put(MovieContract.TrailerEntry.COL_TRAILER_SOURCE, key);
+
+                valuesVector.add(values);
+
+                String trailerData = key + "\n" + name;
 
                 mArrayListTrailer.add(trailerData);
-
-
+            }
+            if (valuesVector.size() > 0) {
+                ContentValues contentValues[] = new ContentValues[]{};
+                valuesVector.toArray(contentValues);
+                mContext.getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI, contentValues);
             }
 
-        }
-        return mArrayListTrailer;
-    }
+            Cursor cursor = mContext.getContentResolver().query(MovieContract.TrailerEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+            assert cursor != null;
+            valuesVector = new Vector<>(cursor.getCount());
+            if (cursor.moveToFirst()) {
+                do {
+                    ContentValues cv = new ContentValues();
+                    DatabaseUtils.cursorRowToContentValues(cursor, cv);
+                    valuesVector.add(cv);
+                } while (cursor.moveToNext());
+            }
+            Log.d("FetchTrailerTask", "FetchTrailerTask Complete. " + valuesVector.size() + " Inserted");
 
-    @Override
-    protected void onPostExecute(ArrayList<String> strings) {
-        super.onPostExecute(strings);
-        Log.v("Trailer String", String.valueOf(strings));
-        if(strings!=null)
-        {
-            DetailFragment.mArrayAdapterTrailer= new ArrayAdapter<>(mContext,R.layout.list_item_trailer,
-                    R.id.list_item_trailer_textView,strings);
-            DetailFragment.trailerListView.setAdapter(DetailFragment.mArrayAdapterTrailer);
-            DetailFragment.mArrayAdapterTrailer.notifyDataSetChanged();
+
         }
     }
 }

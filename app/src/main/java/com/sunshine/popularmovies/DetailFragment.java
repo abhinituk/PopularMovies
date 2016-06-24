@@ -24,14 +24,21 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.sunshine.popularmovies.data.MovieContract;
 
+import java.util.ArrayList;
+
 /**
  * Created by Abhishek on 13-05-2016.
  */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final int LOADER_ID = 1;
+    private final int REVIEW_LOADER_ID = 2;
+    private final int TRAILER_LOADER_ID = 3;
+
     static ArrayAdapter<String> mArrayAdapterTrailer;
     static ArrayAdapter<String> mArrayAdapterReview;
+    static ArrayList<String> mArrayListReview;
+    static ArrayList<String> mArrayListTrailer;
     static ListView trailerListView;
     static ListView reviewListView;
 
@@ -55,12 +62,39 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static int COL_MOVIE_TITLE = 6;
     private static int COL_VOTE_AVG = 7;
     private static int COL_VOTE_COUNT = 8;
+
+    private static String[] REVIEW_COLUMN = {
+            MovieContract.ReviewEntry._ID,
+            MovieContract.ReviewEntry.COL_REVIEW_AUTHOR,
+            MovieContract.ReviewEntry.COL_REVIEW_CONTENT
+    };
+
+    private static int COL_REVIEW_ID = 0;
+    private static int COL_REVIEW_MOVIE_ID = 1;
+    private static int COL_REVIEW_AUTHOR = 2;
+    private static int COL_REVIEW_CONTENT = 3;
+
+    private static String[] TRAILER_COLUMN = {
+            MovieContract.TrailerEntry._ID,
+            MovieContract.TrailerEntry.COL_TRAILER_NAME,
+            MovieContract.TrailerEntry.COL_TRAILER_SOURCE
+    };
+
+    private static int COL_TRAILER_ID = 0;
+    private static int COL_TRAILER_MOVIE_ID = 1;
+    private static int COL_TRAILER_NAME = 2;
+    private static int COL_TRAILER_SOURCE = 3;
+
+
     Uri mUri;
 
+    int mMovieId;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         getLoaderManager().initLoader(LOADER_ID, null, this);
+        getLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
+        getLoaderManager().initLoader(TRAILER_LOADER_ID, null, this);
         super.onActivityCreated(savedInstanceState);
 
     }
@@ -81,12 +115,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     public void updateTrailer() {
         FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext());
-        fetchTrailerTask.execute(269149);
+        fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     public void updateReview() {
         FetchReviewTask fetchReviewTask = new FetchReviewTask(getContext());
-        fetchReviewTask.execute(269149);
+        fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     @Override
@@ -110,47 +144,41 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mUri = getActivity().getIntent().getData();
+
+        mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
         trailerListView = (ListView) view.findViewById(R.id.trailer_list_view);
         reviewListView = (ListView) view.findViewById(R.id.review_list_view);
-
-
-//        if (mArrayListTrailer != null) {
-//            Log.v("Trailer", String.valueOf(mArrayListTrailer));
-//            ArrayAdapter<String> trailerAdapter = new ArrayAdapter<>(getContext(),
-//                    R.layout.fragment_detail,
-//                    R.id.list_item_trailer_textView,
-//                    mArrayListTrailer);
-//            trailerListView.setAdapter(trailerAdapter);
-//
-//        }
-//        if (mArrayListReview != null) {
-//            Log.v("Review", String.valueOf(mArrayListReview));
-//            ArrayAdapter<String> reviewAdapter = new ArrayAdapter<>(getContext(),
-//                    R.layout.fragment_detail,
-//                    R.id.list_item_review_textView,
-//                    mArrayListReview);
-//
-//            reviewListView.setAdapter(reviewAdapter);
-//        }
-
-
         return view;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
+        if (id == LOADER_ID) {
 
-        if (null != mUri)
             return new CursorLoader(getActivity(),
                     mUri,
                     DETAIL_COLUMN,
                     null,
                     null,
                     null);
-        else
+        } else if (id == REVIEW_LOADER_ID) {
+            return new CursorLoader(getActivity(),
+                    MovieContract.ReviewEntry.buildReviewrWithId(mMovieId),
+                    REVIEW_COLUMN,
+                    null,
+                    null,
+                    null);
+        } else if (id == TRAILER_LOADER_ID) {
+            return new CursorLoader(getActivity(),
+                    MovieContract.TrailerEntry.buildTrailerWithId(mMovieId),
+                    TRAILER_COLUMN,
+                    null,
+                    null,
+                    null);
+        } else
             return null;
 
 
@@ -158,35 +186,72 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        switch (loader.getId()) {
+            case 1:
+                if (!data.moveToFirst()) {
+                    return;
+                }
+                String title = data.getString(COL_MOVIE_TITLE);
+                String overview = data.getString(COL_OVERVIEW);
+                String vote_average = data.getString(COL_VOTE_AVG);
+                String release_date = data.getString(COL_RELEASE_DATE);
+                String poster_path = data.getString(COL_POSTER_PATH);
 
-        if (!data.moveToFirst()) {
-            return;
+                ImageView mPoster = (ImageView) getView().findViewById(R.id.detail_image_view);
+                TextView mTitle = (TextView) getView().findViewById(R.id.detail_title);
+                TextView mOverview = (TextView) getView().findViewById(R.id.detail_overview);
+                TextView mReleaseDate = (TextView) getView().findViewById(R.id.detail_release_date);
+                TextView mVoteAvg = (TextView) getView().findViewById(R.id.detail_vote_average);
+
+                mTitle.setText(title);
+                mOverview.setText(overview);
+                mVoteAvg.setText(vote_average);
+                mReleaseDate.setText(release_date);
+
+                Picasso.with(getContext())
+                        .load(poster_path)
+                        .placeholder(R.drawable.placeholder)
+                        .error(R.drawable.placeholder_error)
+                        .into(mPoster);
+            case 2:
+                mArrayListReview = new ArrayList<>();
+                if (data.moveToFirst()) {
+                    do {
+                        String author = data.getString(COL_REVIEW_AUTHOR);
+                        String content = data.getString(COL_REVIEW_CONTENT);
+                        String resultReview = author + "\n" + content;
+                        mArrayListReview.add(resultReview);
+                    } while (data.moveToNext());
+                }
+                mArrayAdapterReview = new ArrayAdapter<>(getContext(),
+                        R.layout.list_item_review,
+                        R.id.list_item_review_textView,
+                        mArrayListReview);
+                reviewListView.setAdapter(mArrayAdapterReview);
+
+            case 3:
+                mArrayListTrailer = new ArrayList<>();
+                if (data.moveToFirst()) {
+                    do {
+                        String trailerName = data.getString(COL_TRAILER_NAME);
+                        String trailerSource = data.getString(COL_TRAILER_SOURCE);
+                        String resultTrailer = trailerName + "\n" + trailerSource;
+                        mArrayListTrailer.add(resultTrailer);
+                    } while (data.moveToNext());
+                }
+
+                mArrayAdapterTrailer = new ArrayAdapter<>(getContext(),
+                        R.layout.list_item_trailer,
+                        R.id.list_item_trailer_textView,
+                        mArrayListTrailer);
+                trailerListView.setAdapter(mArrayAdapterTrailer);
+
+
         }
-        String title = data.getString(COL_MOVIE_TITLE);
-        String overview = data.getString(COL_OVERVIEW);
-        double popularity = data.getDouble(COL_POPULARITY);
-        String vote_average = data.getString(COL_VOTE_AVG);
-        String release_date = data.getString(COL_RELEASE_DATE);
-        String poster_path = data.getString(COL_POSTER_PATH);
-
-        ImageView mPoster = (ImageView) getView().findViewById(R.id.detail_image_view);
-        TextView mTitle = (TextView) getView().findViewById(R.id.detail_title);
-        TextView mOverview = (TextView) getView().findViewById(R.id.detail_overview);
-        TextView mReleaseDate = (TextView) getView().findViewById(R.id.detail_release_date);
-        TextView mVoteAvg = (TextView) getView().findViewById(R.id.detail_vote_average);
-
-        mTitle.setText(title);
-        mOverview.setText(overview);
-        mVoteAvg.setText(vote_average);
-        mReleaseDate.setText(release_date);
-
-        Picasso.with(getContext())
-                .load(poster_path)
-                .placeholder(R.drawable.placeholder)
-                .error(R.drawable.placeholder_error)
-                .into(mPoster);
-
     }
+
+
+
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {

@@ -1,10 +1,14 @@
 package com.sunshine.popularmovies;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
-import android.widget.ArrayAdapter;
+
+import com.sunshine.popularmovies.data.MovieContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,6 +21,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Vector;
 
 /**
  * Created by Abhishek on 23-06-2016.
@@ -86,7 +91,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
                 }
         }
         try {
-            return getReviewDataFromJson(jsonString,params[0]);
+            getReviewDataFromJson(jsonString,params[0]);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -95,7 +100,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
         return null;
     }
 
-    public ArrayList<String> getReviewDataFromJson(String jsonString, int movieId) throws JSONException {
+    public void getReviewDataFromJson(String jsonString, int movieId) throws JSONException {
 
         final String TMDB_REVIEW_RESULT="results";
         final String TMDB_REVIEW_AUTHOR="author";
@@ -105,6 +110,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
         {
             JSONObject object= new JSONObject(jsonString);
             JSONArray result= object.getJSONArray(TMDB_REVIEW_RESULT);
+            Vector<ContentValues> valuesVector= new Vector<>(result.length());
 
             for(int i=0;i<result.length();i++)
             {
@@ -112,25 +118,38 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
                 String author = review.getString(TMDB_REVIEW_AUTHOR);
                 String content= review.getString(TMDB_REVIEW_CONTENT);
 
+                ContentValues values= new ContentValues();
+                values.put(MovieContract.ReviewEntry.COL_REVIEW_ID,movieId);
+                values.put(MovieContract.ReviewEntry.COL_REVIEW_AUTHOR,author);
+                values.put(MovieContract.ReviewEntry.COL_REVIEW_CONTENT,content);
+
+                valuesVector.add(values);
                 String reviewData= author+"\n"+content;
                 mArrayListReview.add(reviewData);
             }
+            if(valuesVector.size()>0)
+            {
+                ContentValues contentValues[]= new ContentValues[]{};
+                valuesVector.toArray(contentValues);
+                mContext.getContentResolver().bulkInsert(MovieContract.ReviewEntry.CONTENT_URI,contentValues);
+            }
+            Cursor cursor = mContext.getContentResolver().query(MovieContract.ReviewEntry.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null);
+            assert cursor != null;
+            valuesVector = new Vector<>(cursor.getCount());
+            if (cursor.moveToFirst()) {
+                do {
+                    ContentValues cv = new ContentValues();
+                    DatabaseUtils.cursorRowToContentValues(cursor, cv);
+                    valuesVector.add(cv);
+                } while (cursor.moveToNext());
+            }
+            Log.d("Fetch ", "FetchReview Complete. " + valuesVector.size() + " Inserted");
+
         }
-        return mArrayListReview;
     }
 
-    @Override
-    protected void onPostExecute(ArrayList<String> strings) {
-        super.onPostExecute(strings);
-
-        Log.v("Review String", String.valueOf(strings));
-        if(strings!=null)
-        {
-            DetailFragment.mArrayAdapterReview= new ArrayAdapter<String>(mContext,R.layout.list_item_review,
-                    R.id.list_item_review_textView,
-                    strings);
-            DetailFragment.reviewListView.setAdapter(DetailFragment.mArrayAdapterReview);
-            DetailFragment.mArrayAdapterReview.notifyDataSetChanged();
-        }
-    }
 }
