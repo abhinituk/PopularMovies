@@ -10,7 +10,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,16 +24,16 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 import com.sunshine.popularmovies.data.MovieContract;
 
-import java.util.ArrayList;
-
 /**
  * Created by Abhishek on 13-05-2016.
  */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final int LOADER_ID = 1;
-    static ArrayList<String> mArrayListTrailer;
-    static ArrayList<String> mArrayListReview;
+    static ArrayAdapter<String> mArrayAdapterTrailer;
+    static ArrayAdapter<String> mArrayAdapterReview;
+    static ListView trailerListView;
+    static ListView reviewListView;
 
     private static String[] DETAIL_COLUMN = {
             MovieContract.MovieEntry._ID,
@@ -81,12 +80,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
     public void updateTrailer() {
-        FetchTrailerTask fetchTrailerTask = new FetchTrailerTask();
+        FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext());
         fetchTrailerTask.execute(269149);
     }
 
     public void updateReview() {
-        FetchReviewTask fetchReviewTask = new FetchReviewTask();
+        FetchReviewTask fetchReviewTask = new FetchReviewTask(getContext());
         fetchReviewTask.execute(269149);
     }
 
@@ -113,12 +112,37 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mUri = getActivity().getIntent().getData();
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
+        trailerListView = (ListView) view.findViewById(R.id.trailer_list_view);
+        reviewListView = (ListView) view.findViewById(R.id.review_list_view);
+
+
+//        if (mArrayListTrailer != null) {
+//            Log.v("Trailer", String.valueOf(mArrayListTrailer));
+//            ArrayAdapter<String> trailerAdapter = new ArrayAdapter<>(getContext(),
+//                    R.layout.fragment_detail,
+//                    R.id.list_item_trailer_textView,
+//                    mArrayListTrailer);
+//            trailerListView.setAdapter(trailerAdapter);
+//
+//        }
+//        if (mArrayListReview != null) {
+//            Log.v("Review", String.valueOf(mArrayListReview));
+//            ArrayAdapter<String> reviewAdapter = new ArrayAdapter<>(getContext(),
+//                    R.layout.fragment_detail,
+//                    R.id.list_item_review_textView,
+//                    mArrayListReview);
+//
+//            reviewListView.setAdapter(reviewAdapter);
+//        }
+
 
         return view;
     }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+
+
         if (null != mUri)
             return new CursorLoader(getActivity(),
                     mUri,
@@ -151,13 +175,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         TextView mReleaseDate = (TextView) getView().findViewById(R.id.detail_release_date);
         TextView mVoteAvg = (TextView) getView().findViewById(R.id.detail_vote_average);
 
-        ListView trailerListView = (ListView) getView().findViewById(R.id.trailer_list_view);
-        ListView reviewListView = (ListView) getView().findViewById(R.id.review_list_view);
-
-
-        //DetailViewHolder holder= (DetailViewHolder) getView().getTag();
-        Log.v("Title", title);
-
         mTitle.setText(title);
         mOverview.setText(overview);
         mVoteAvg.setText(vote_average);
@@ -168,19 +185,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder_error)
                 .into(mPoster);
-        if (mArrayListTrailer != null && mArrayListReview != null) {
-            ArrayAdapter<String> trailerAdapter = new ArrayAdapter<>(getContext(),
-                    R.layout.fragment_detail,
-                    R.id.list_item_trailer_textView,
-                    mArrayListTrailer);
-            trailerListView.setAdapter(trailerAdapter);
-            ArrayAdapter<String> reviewAdapter = new ArrayAdapter<>(getContext(),
-                    R.layout.fragment_detail,
-                    R.id.list_item_review_textView,
-                    mArrayListReview);
 
-            reviewListView.setAdapter(reviewAdapter);
-        }
     }
 
     @Override

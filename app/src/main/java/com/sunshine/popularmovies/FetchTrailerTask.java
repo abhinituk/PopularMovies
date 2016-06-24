@@ -1,8 +1,10 @@
 package com.sunshine.popularmovies;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,6 +24,11 @@ import java.util.ArrayList;
 public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>> {
 
     ArrayList<String> mArrayListTrailer=new ArrayList<>();
+    Context mContext;
+
+    public FetchTrailerTask(Context context) {
+        this.mContext=context;
+    }
 
     @Override
     protected ArrayList<String> doInBackground(Integer... params) {
@@ -110,9 +117,13 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
     @Override
     protected void onPostExecute(ArrayList<String> strings) {
         super.onPostExecute(strings);
+        Log.v("Trailer String", String.valueOf(strings));
         if(strings!=null)
         {
-            DetailFragment.mArrayListTrailer=strings;
+            DetailFragment.mArrayAdapterTrailer= new ArrayAdapter<>(mContext,R.layout.list_item_trailer,
+                    R.id.list_item_trailer_textView,strings);
+            DetailFragment.trailerListView.setAdapter(DetailFragment.mArrayAdapterTrailer);
+            DetailFragment.mArrayAdapterTrailer.notifyDataSetChanged();
         }
     }
 }

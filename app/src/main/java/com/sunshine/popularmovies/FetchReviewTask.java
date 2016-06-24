@@ -1,7 +1,10 @@
 package com.sunshine.popularmovies;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.util.Log;
+import android.widget.ArrayAdapter;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,6 +22,11 @@ import java.util.ArrayList;
  * Created by Abhishek on 23-06-2016.
  */
 public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>> {
+
+    Context mContext;
+    public FetchReviewTask(Context context) {
+       this.mContext=context;
+    }
 
     ArrayList<String> mArrayListReview= new ArrayList<>();
     @Override
@@ -114,9 +122,15 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
     @Override
     protected void onPostExecute(ArrayList<String> strings) {
         super.onPostExecute(strings);
+
+        Log.v("Review String", String.valueOf(strings));
         if(strings!=null)
         {
-            DetailFragment.mArrayListReview=strings;
+            DetailFragment.mArrayAdapterReview= new ArrayAdapter<String>(mContext,R.layout.list_item_review,
+                    R.id.list_item_review_textView,
+                    strings);
+            DetailFragment.reviewListView.setAdapter(DetailFragment.mArrayAdapterReview);
+            DetailFragment.mArrayAdapterReview.notifyDataSetChanged();
         }
     }
 }
