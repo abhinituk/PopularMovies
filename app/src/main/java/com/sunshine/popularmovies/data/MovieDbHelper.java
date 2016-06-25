@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class MovieDbHelper extends SQLiteOpenHelper {
 
-    private static final int DATEBASE_VERSION = 7;
+    private static final int DATEBASE_VERSION = 8;
     public static final String DATABASE_NAME = "movie.db";
 
     public MovieDbHelper(Context context) {
@@ -38,7 +38,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                         MovieContract.TrailerEntry.COL_TRAILER_NAME+" TEXT NOT NULL, "+
                         MovieContract.TrailerEntry.COL_TRAILER_SOURCE+" TEXT NOT NULL, "+
                         "UNIQUE ("+ MovieContract.TrailerEntry.COL_TRAILER_ID+","+
-                        MovieContract.TrailerEntry.COL_TRAILER_NAME+"));";
+                        MovieContract.TrailerEntry.COL_TRAILER_NAME+") ON CONFLICT REPLACE);";
 
         final String CREATE_TABLE_REVIEW=
                 "CREATE TABLE "+ MovieContract.ReviewEntry.TABLE_NAME+" ("+
@@ -47,7 +47,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
                         MovieContract.ReviewEntry.COL_REVIEW_AUTHOR+" TEXT NOT NULL, "+
                         MovieContract.ReviewEntry.COL_REVIEW_CONTENT+" TEXT NOT NULL, "+
                         "UNIQUE ("+ MovieContract.ReviewEntry.COL_REVIEW_ID+","+
-                        MovieContract.ReviewEntry.COL_REVIEW_AUTHOR+"));";
+                        MovieContract.ReviewEntry.COL_REVIEW_AUTHOR+") ON CONFLICT REPLACE);";
 
 
         db.execSQL(CREATE_TABLE_MOVIE);

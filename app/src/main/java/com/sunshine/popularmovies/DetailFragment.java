@@ -10,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -65,6 +66,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static String[] REVIEW_COLUMN = {
             MovieContract.ReviewEntry._ID,
+            MovieContract.ReviewEntry.COL_REVIEW_ID,
             MovieContract.ReviewEntry.COL_REVIEW_AUTHOR,
             MovieContract.ReviewEntry.COL_REVIEW_CONTENT
     };
@@ -76,6 +78,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static String[] TRAILER_COLUMN = {
             MovieContract.TrailerEntry._ID,
+            MovieContract.TrailerEntry.COL_TRAILER_ID,
             MovieContract.TrailerEntry.COL_TRAILER_NAME,
             MovieContract.TrailerEntry.COL_TRAILER_SOURCE
     };
@@ -115,12 +118,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     public void updateTrailer() {
         FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext());
-        fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        fetchTrailerTask.execute(269149);
     }
 
     public void updateReview() {
         FetchReviewTask fetchReviewTask = new FetchReviewTask(getContext());
-        fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        fetchReviewTask.execute(269149);
     }
 
     @Override
@@ -144,6 +147,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mUri = getActivity().getIntent().getData();
+        Log.v("Uri Received", String.valueOf(mUri));
 
         mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);

@@ -72,6 +72,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
             if(buffer.length() == 0)
                 return null;
             jsonString= buffer.toString();
+            Log.v("json string",jsonString);
 
 
 
@@ -92,6 +93,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
         }
         try {
             getReviewDataFromJson(jsonString,params[0]);
+            Log.v("Data Sent", String.valueOf(params[0])+jsonString);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -108,6 +110,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
 
         if(jsonString!=null)
         {
+            Log.v("Json Reveived",jsonString);
             JSONObject object= new JSONObject(jsonString);
             JSONArray result= object.getJSONArray(TMDB_REVIEW_RESULT);
             Vector<ContentValues> valuesVector= new Vector<>(result.length());
@@ -117,7 +120,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
                 JSONObject review= result.getJSONObject(i);
                 String author = review.getString(TMDB_REVIEW_AUTHOR);
                 String content= review.getString(TMDB_REVIEW_CONTENT);
-
+                Log.v("Data",author+content);
                 ContentValues values= new ContentValues();
                 values.put(MovieContract.ReviewEntry.COL_REVIEW_ID,movieId);
                 values.put(MovieContract.ReviewEntry.COL_REVIEW_AUTHOR,author);
@@ -127,17 +130,22 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
                 String reviewData= author+"\n"+content;
                 mArrayListReview.add(reviewData);
             }
+            Log.v("Values Vector size", String.valueOf(valuesVector.size()));
             if(valuesVector.size()>0)
             {
                 ContentValues contentValues[]= new ContentValues[]{};
                 valuesVector.toArray(contentValues);
-                mContext.getContentResolver().bulkInsert(MovieContract.ReviewEntry.CONTENT_URI,contentValues);
+                int returnCount=mContext.getContentResolver().bulkInsert(MovieContract.ReviewEntry.CONTENT_URI,contentValues);
+                Log.v("Return Count", String.valueOf(returnCount));
             }
+
+
             Cursor cursor = mContext.getContentResolver().query(MovieContract.ReviewEntry.CONTENT_URI,
                     null,
                     null,
                     null,
                     null);
+            Log.v("Review Cursor size", String.valueOf(cursor.getCount()));
             assert cursor != null;
             valuesVector = new Vector<>(cursor.getCount());
             if (cursor.moveToFirst()) {

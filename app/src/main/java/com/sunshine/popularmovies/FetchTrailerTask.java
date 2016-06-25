@@ -124,7 +124,8 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
             if (valuesVector.size() > 0) {
                 ContentValues contentValues[] = new ContentValues[]{};
                 valuesVector.toArray(contentValues);
-                mContext.getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI, contentValues);
+                int returnCount = mContext.getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI, contentValues);
+                Log.v("Return Count", String.valueOf(returnCount));
             }
 
             Cursor cursor = mContext.getContentResolver().query(MovieContract.TrailerEntry.CONTENT_URI,
@@ -133,6 +134,8 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
                     null,
                     null);
             assert cursor != null;
+            Log.v("Trailer Cursor size", String.valueOf(cursor.getCount()));
+
             valuesVector = new Vector<>(cursor.getCount());
             if (cursor.moveToFirst()) {
                 do {

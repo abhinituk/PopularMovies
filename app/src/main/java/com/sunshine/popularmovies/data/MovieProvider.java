@@ -21,13 +21,12 @@ public class MovieProvider extends ContentProvider {
     static final int MOVIE_WITH_MOVIE_ID = 101;
 
     //Constants defined for Trailer Table
-    static final int TRAILER=102;
-    static final int TRAILER_WITH_ID=103;
+    static final int TRAILER = 202;
+    static final int TRAILER_WITH_ID = 103;
 
     //Constants defined for Review Table
-    static final int REVIEW=104;
-    static final int REVIEW_WITH_ID=105;
-
+    static final int REVIEW = 104;
+    static final int REVIEW_WITH_ID = 105;
 
 
     public MovieProvider() {
@@ -40,25 +39,23 @@ public class MovieProvider extends ContentProvider {
 
     static {
         mSQLiteQueryBuilder = new SQLiteQueryBuilder();
-        mSQLiteQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
-        mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
-        mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
+//        mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
+//        mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
     }
 
     //movie.movie_id=?
     final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
     //review.movie_id=?
-    final String reviewWithId= MovieContract.ReviewEntry.COL_REVIEW_ID+"=?";
+    final String reviewWithId = MovieContract.ReviewEntry.COL_REVIEW_ID + "=?";
 
     //trailer.movie_id=?
-    final String trailerWithId= MovieContract.TrailerEntry.COL_TRAILER_ID+"=?";
+    final String trailerWithId = MovieContract.TrailerEntry.COL_TRAILER_ID + "=?";
 
-    public Cursor getTrailerWithId(Uri uri,String projection[],String sortOrder)
-    {
+    public Cursor getTrailerWithId(Uri uri, String projection[], String sortOrder) {
         int id = MovieContract.TrailerEntry.getTrailerMovieId(uri);
         String selection = trailerWithId;
-        String selectionArgs[]= new String[]{String.valueOf(id)};
+        String selectionArgs[] = new String[]{String.valueOf(id)};
 
         return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
                 projection,
@@ -69,11 +66,10 @@ public class MovieProvider extends ContentProvider {
                 sortOrder);
     }
 
-    public Cursor getReviewWithId(Uri uri,String projection[],String sortOrder)
-    {
+    public Cursor getReviewWithId(Uri uri, String projection[], String sortOrder) {
         int id = MovieContract.ReviewEntry.getReviewMovieId(uri);
         String selection = reviewWithId;
-        String selectionArgs[]= new String[]{String.valueOf(id)};
+        String selectionArgs[] = new String[]{String.valueOf(id)};
 
         return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
                 projection,
@@ -85,8 +81,7 @@ public class MovieProvider extends ContentProvider {
     }
 
 
-
-    public Cursor getMovieWithMovieId(Uri uri, String projection[],String sortOrder) {
+    public Cursor getMovieWithMovieId(Uri uri, String projection[], String sortOrder) {
         int id = MovieContract.MovieEntry.getMovieId(uri);
         String selection = movieWithMovieId;
         String selectionArgs[] = new String[]{String.valueOf(id)};
@@ -111,11 +106,11 @@ public class MovieProvider extends ContentProvider {
         matcher.addURI(authority, MovieContract.PATH_MOVIE, MOVIE);
         matcher.addURI(authority, MovieContract.PATH_MOVIE + "/#", MOVIE_WITH_MOVIE_ID);
 
-        matcher.addURI(authority,MovieContract.PATH_TRAILER,TRAILER);
-        matcher.addURI(authority, MovieContract.PATH_TRAILER+"/#",TRAILER_WITH_ID);
+        matcher.addURI(authority, MovieContract.PATH_TRAILER, TRAILER);
+        matcher.addURI(authority, MovieContract.PATH_TRAILER + "/#", TRAILER_WITH_ID);
 
-        matcher.addURI(authority,MovieContract.PATH_REVIEW,REVIEW);
-        matcher.addURI(authority,MovieContract.PATH_REVIEW+"/#",REVIEW_WITH_ID);
+        matcher.addURI(authority, MovieContract.PATH_REVIEW, REVIEW);
+        matcher.addURI(authority, MovieContract.PATH_REVIEW + "/#", REVIEW_WITH_ID);
 
         return matcher;
 
@@ -137,6 +132,7 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE:
+                mSQLiteQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
                 cursor = mMovieDbHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
                         projection,
@@ -147,11 +143,13 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
             case MOVIE_WITH_MOVIE_ID:
-                cursor = getMovieWithMovieId(uri, projection,sortOrder);
+                mSQLiteQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
+                cursor = getMovieWithMovieId(uri, projection, sortOrder);
                 break;
 
             case TRAILER:
-                cursor= mMovieDbHelper.getReadableDatabase().query(
+                mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
+                cursor = mMovieDbHelper.getReadableDatabase().query(
                         MovieContract.TrailerEntry.TABLE_NAME,
                         projection,
                         selection,
@@ -161,11 +159,13 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
             case TRAILER_WITH_ID:
-                cursor= getTrailerWithId(uri,projection,sortOrder);
+                mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
+                cursor = getTrailerWithId(uri, projection, sortOrder);
                 break;
 
             case REVIEW:
-                cursor= mMovieDbHelper.getReadableDatabase().query(
+                mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
+                cursor = mMovieDbHelper.getReadableDatabase().query(
                         MovieContract.ReviewEntry.TABLE_NAME,
                         projection,
                         selection,
@@ -175,7 +175,8 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
             case REVIEW_WITH_ID:
-                cursor=getReviewWithId(uri,projection,sortOrder);
+                mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
+                cursor = getReviewWithId(uri, projection, sortOrder);
                 break;
 
             default:
@@ -231,7 +232,7 @@ public class MovieProvider extends ContentProvider {
                 break;
 
             case TRAILER:
-                long idTrailer= db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, values);
+                long idTrailer = db.insert(MovieContract.TrailerEntry.TABLE_NAME, null, values);
                 if (idTrailer > 0)
                     returnUri = MovieContract.TrailerEntry.buildTrailerUri(idTrailer);
                 else
@@ -239,7 +240,7 @@ public class MovieProvider extends ContentProvider {
                 break;
 
             case REVIEW:
-                long idReview= db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, values);
+                long idReview = db.insert(MovieContract.ReviewEntry.TABLE_NAME, null, values);
                 if (idReview > 0)
                     returnUri = MovieContract.ReviewEntry.buildReviewUri(idReview);
                 else
@@ -335,7 +336,7 @@ public class MovieProvider extends ContentProvider {
                 } finally {
                     db.endTransaction();
                 }
-                getContext().getContentResolver().notifyChange(uri,null);
+                getContext().getContentResolver().notifyChange(uri, null);
                 return returnCount;
 
 
@@ -352,7 +353,7 @@ public class MovieProvider extends ContentProvider {
                 } finally {
                     db.endTransaction();
                 }
-                getContext().getContentResolver().notifyChange(uri,null);
+                getContext().getContentResolver().notifyChange(uri, null);
                 return returnCountTrailer;
 
             case REVIEW:
@@ -368,7 +369,7 @@ public class MovieProvider extends ContentProvider {
                 } finally {
                     db.endTransaction();
                 }
-                getContext().getContentResolver().notifyChange(uri,null);
+                getContext().getContentResolver().notifyChange(uri, null);
                 return returnCountReview;
 
             default:
