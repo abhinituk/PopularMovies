@@ -122,7 +122,7 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
                 mArrayListTrailer.add(trailerData);
             }
             if (valuesVector.size() > 0) {
-                ContentValues contentValues[] = new ContentValues[]{};
+                ContentValues contentValues[] = new ContentValues[valuesVector.size()];
                 valuesVector.toArray(contentValues);
                 int returnCount = mContext.getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI, contentValues);
                 Log.v("Return Count", String.valueOf(returnCount));

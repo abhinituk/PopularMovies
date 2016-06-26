@@ -32,16 +32,14 @@ import java.util.ArrayList;
  */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final int LOADER_ID = 1;
-    private final int REVIEW_LOADER_ID = 2;
-    private final int TRAILER_LOADER_ID = 3;
+    private final int LOADER_ID = 100;
+    private final int REVIEW_LOADER_ID = 200;
+    private final int TRAILER_LOADER_ID = 300;
 
     static ArrayAdapter<String> mArrayAdapterTrailer;
     static ArrayAdapter<String> mArrayAdapterReview;
     static ArrayList<String> mArrayListReview;
     static ArrayList<String> mArrayListTrailer;
-    static ListView trailerListView;
-    static ListView reviewListView;
 
     private static String[] DETAIL_COLUMN = {
             MovieContract.MovieEntry._ID,
@@ -118,12 +116,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     public void updateTrailer() {
         FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext());
-        fetchTrailerTask.execute(269149);
+        fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     public void updateReview() {
         FetchReviewTask fetchReviewTask = new FetchReviewTask(getContext());
-        fetchReviewTask.execute(269149);
+        fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     @Override
@@ -152,8 +150,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        trailerListView = (ListView) view.findViewById(R.id.trailer_list_view);
-        reviewListView = (ListView) view.findViewById(R.id.review_list_view);
+
         return view;
     }
 
@@ -191,7 +188,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         switch (loader.getId()) {
-            case 1:
+            case LOADER_ID:
                 if (!data.moveToFirst()) {
                     return;
                 }
@@ -217,38 +214,47 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .placeholder(R.drawable.placeholder)
                         .error(R.drawable.placeholder_error)
                         .into(mPoster);
-            case 2:
+            case REVIEW_LOADER_ID:
+                ListView reviewListView = (ListView) getView().findViewById(R.id.review_list_view);
+
                 mArrayListReview = new ArrayList<>();
                 if (data.moveToFirst()) {
                     do {
                         String author = data.getString(COL_REVIEW_AUTHOR);
                         String content = data.getString(COL_REVIEW_CONTENT);
                         String resultReview = author + "\n" + content;
+                        Log.v("Review",resultReview);
                         mArrayListReview.add(resultReview);
                     } while (data.moveToNext());
                 }
+                Log.v("Review ArrayList", String.valueOf(mArrayListReview));
                 mArrayAdapterReview = new ArrayAdapter<>(getContext(),
                         R.layout.list_item_review,
                         R.id.list_item_review_textView,
                         mArrayListReview);
                 reviewListView.setAdapter(mArrayAdapterReview);
+                mArrayAdapterReview.notifyDataSetChanged();
 
-            case 3:
+            case TRAILER_LOADER_ID:
+                ListView trailerListView = (ListView) getView().findViewById(R.id.trailer_list_view);
                 mArrayListTrailer = new ArrayList<>();
                 if (data.moveToFirst()) {
                     do {
                         String trailerName = data.getString(COL_TRAILER_NAME);
                         String trailerSource = data.getString(COL_TRAILER_SOURCE);
                         String resultTrailer = trailerName + "\n" + trailerSource;
+
                         mArrayListTrailer.add(resultTrailer);
                     } while (data.moveToNext());
                 }
+                Log.v("Trailer ArrayList", String.valueOf(mArrayListTrailer));
 
                 mArrayAdapterTrailer = new ArrayAdapter<>(getContext(),
                         R.layout.list_item_trailer,
                         R.id.list_item_trailer_textView,
                         mArrayListTrailer);
                 trailerListView.setAdapter(mArrayAdapterTrailer);
+                mArrayAdapterTrailer.notifyDataSetChanged();
 
 
         }
