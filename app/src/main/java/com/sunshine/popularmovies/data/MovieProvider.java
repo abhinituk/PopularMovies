@@ -6,11 +6,9 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 
 public class MovieProvider extends ContentProvider {
@@ -34,16 +32,6 @@ public class MovieProvider extends ContentProvider {
         super();
     }
 
-
-    //SQLite Query Builder
-    private static final SQLiteQueryBuilder mSQLiteQueryBuilder;
-
-    static {
-        mSQLiteQueryBuilder = new SQLiteQueryBuilder();
-//        mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
-//        mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
-    }
-
     //movie.movie_id=?
     final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
@@ -53,56 +41,11 @@ public class MovieProvider extends ContentProvider {
     //trailer.movie_id=?
     final String trailerWithId = MovieContract.TrailerEntry.COL_TRAILER_ID + "=?";
 
-    public Cursor getTrailerWithId(Uri uri, String projection[], String sortOrder) {
-        int id = MovieContract.TrailerEntry.getTrailerMovieId(uri);
-        String selection = trailerWithId;
-        String selectionArgs[] = new String[]{String.valueOf(id)};
-        //mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
-        Log.v("Get Table ",mSQLiteQueryBuilder.getTables());
-
-        return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder);
-    }
-
-    public Cursor getReviewWithId(Uri uri, String projection[], String sortOrder) {
-        int id = MovieContract.ReviewEntry.getReviewMovieId(uri);
-        String selection = reviewWithId;
-        String selectionArgs[] = new String[]{String.valueOf(id)};
 
 
-        //mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
-        Log.v("Get Table ",mSQLiteQueryBuilder.getTables());
-        return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder);
-    }
 
 
-    public Cursor getMovieWithMovieId(Uri uri, String projection[], String sortOrder) {
-        int id = MovieContract.MovieEntry.getMovieId(uri);
-        String selection = movieWithMovieId;
-        String selectionArgs[] = new String[]{String.valueOf(id)};
 
-        //mSQLiteQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
-        Log.v("Get Table",mSQLiteQueryBuilder.getTables());
-
-        return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
-                projection,
-                selection,
-                selectionArgs,
-                null,
-                null,
-                sortOrder);
-    }
 
 
     private static UriMatcher buildUriMatcher() {
@@ -141,7 +84,6 @@ public class MovieProvider extends ContentProvider {
 
         switch (match) {
             case MOVIE:
-                mSQLiteQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
                 cursor = mMovieDbHelper.getReadableDatabase().query(
                         MovieContract.MovieEntry.TABLE_NAME,
                         projection,
@@ -151,13 +93,21 @@ public class MovieProvider extends ContentProvider {
                         null,
                         sortOrder);
                 break;
+
             case MOVIE_WITH_MOVIE_ID:
-                mSQLiteQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
-                cursor = getMovieWithMovieId(uri, projection, sortOrder);
+                int idForMovie = MovieContract.MovieEntry.getMovieId(uri);
+                cursor= mMovieDbHelper.getReadableDatabase().query(
+                        MovieContract.MovieEntry.TABLE_NAME,
+                        projection,
+                        movieWithMovieId,
+                        new String[]{String.valueOf(idForMovie)},
+                        null,
+                        null,
+                        sortOrder
+                );
                 break;
 
             case TRAILER:
-                mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
                 cursor = mMovieDbHelper.getReadableDatabase().query(
                         MovieContract.TrailerEntry.TABLE_NAME,
                         projection,
@@ -168,12 +118,20 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
             case TRAILER_WITH_ID:
-                mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
-                cursor = getTrailerWithId(uri, projection, sortOrder);
+                int idForTrailer = MovieContract.TrailerEntry.getTrailerMovieId(uri);
+                cursor = mMovieDbHelper.getReadableDatabase().query(
+                        MovieContract.TrailerEntry.TABLE_NAME,
+                        projection,
+                        trailerWithId,
+                        new String[]{String.valueOf(idForTrailer)},
+                        null,
+                        null,
+                        sortOrder
+                );
+
                 break;
 
             case REVIEW:
-                mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
                 cursor = mMovieDbHelper.getReadableDatabase().query(
                         MovieContract.ReviewEntry.TABLE_NAME,
                         projection,
@@ -184,9 +142,18 @@ public class MovieProvider extends ContentProvider {
                         sortOrder);
                 break;
             case REVIEW_WITH_ID:
-                mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
-                cursor = getReviewWithId(uri, projection, sortOrder);
-                break;
+
+                int idForReview = MovieContract.ReviewEntry.getReviewMovieId(uri);
+                cursor= mMovieDbHelper.getReadableDatabase().query(
+                        MovieContract.ReviewEntry.TABLE_NAME,
+                        projection,
+                        reviewWithId,
+                        new String[]{String.valueOf(idForReview)},
+                        null,
+                        null,
+                        sortOrder
+                );
+            break;
 
             default:
                 throw new UnsupportedOperationException("Unknown Uri: " + uri);
