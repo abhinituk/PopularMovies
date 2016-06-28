@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 
 public class MovieProvider extends ContentProvider {
@@ -56,6 +57,8 @@ public class MovieProvider extends ContentProvider {
         int id = MovieContract.TrailerEntry.getTrailerMovieId(uri);
         String selection = trailerWithId;
         String selectionArgs[] = new String[]{String.valueOf(id)};
+        //mSQLiteQueryBuilder.setTables(MovieContract.TrailerEntry.TABLE_NAME);
+        Log.v("Get Table ",mSQLiteQueryBuilder.getTables());
 
         return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
                 projection,
@@ -71,6 +74,9 @@ public class MovieProvider extends ContentProvider {
         String selection = reviewWithId;
         String selectionArgs[] = new String[]{String.valueOf(id)};
 
+
+        //mSQLiteQueryBuilder.setTables(MovieContract.ReviewEntry.TABLE_NAME);
+        Log.v("Get Table ",mSQLiteQueryBuilder.getTables());
         return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
                 projection,
                 selection,
@@ -85,6 +91,9 @@ public class MovieProvider extends ContentProvider {
         int id = MovieContract.MovieEntry.getMovieId(uri);
         String selection = movieWithMovieId;
         String selectionArgs[] = new String[]{String.valueOf(id)};
+
+        //mSQLiteQueryBuilder.setTables(MovieContract.MovieEntry.TABLE_NAME);
+        Log.v("Get Table",mSQLiteQueryBuilder.getTables());
 
         return mSQLiteQueryBuilder.query(mMovieDbHelper.getReadableDatabase(),
                 projection,

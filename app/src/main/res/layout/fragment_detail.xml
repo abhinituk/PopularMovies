@@ -5,9 +5,9 @@
     android:layout_height="match_parent">
 
 
-<RelativeLayout android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
         <ImageView
             android:id="@+id/detail_image_view"
@@ -21,65 +21,84 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/detail_image_view"
+            android:layout_centerHorizontal="true"
             android:textSize="30sp"
-            android:textStyle="bold"
-            android:layout_centerHorizontal="true"/>
+            android:textStyle="bold" />
+
         <TextView
+            android:id="@+id/label_overview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/label_overview"
             android:layout_below="@id/detail_title"
-            android:textSize="20sp"
-            android:text="@string/overview"/>
+            android:text="@string/overview"
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/detail_overview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/label_overview" />
+
         <TextView
+            android:id="@+id/release"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@id/detail_overview"
             android:text="@string/release_date"
-            android:textSize="20sp"
-            android:id="@+id/release"
-            android:layout_below="@id/detail_overview"/>
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/detail_release_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/release" />
+
         <TextView
+            android:id="@+id/vote"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_below="@+id/detail_release_date"
             android:text="@string/vote_average"
-            android:id="@+id/vote"
-            android:textSize="20sp"
-            android:layout_below="@+id/detail_release_date"/>
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/detail_vote_average"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@+id/vote" />
-        <ListView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/trailer_list_view"
-            android:nestedScrollingEnabled="true"
+
+
+        <TextView
+            android:id="@+id/trailer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_below="@+id/detail_vote_average"
+            android:text="@string/trailer"
+            android:textSize="20sp" />
 
-            tools:targetApi="lollipop" />
 
         <ListView
+            android:id="@+id/trailer_list_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/review_list_view"
-            android:layout_below="@id/trailer_list_view"
-            android:nestedScrollingEnabled="true"
+            android:layout_below="@+id/trailer"
             tools:targetApi="lollipop" />
 
+        <TextView
+            android:id="@+id/review"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/trailer_list_view"
+            android:text="@string/review"
+            android:textSize="20sp" />
+
+
+        <ListView
+            android:id="@+id/review_list_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/review"
+            tools:targetApi="lollipop" />
 
 
     </RelativeLayout>

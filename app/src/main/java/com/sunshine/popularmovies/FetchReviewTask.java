@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.sunshine.popularmovies.data.MovieContract;
 
@@ -26,6 +25,8 @@ import java.util.Vector;
 /**
  * Created by Abhishek on 23-06-2016.
  */
+
+//This class is used to fetch review by making a request to  /movie/{id}/reviews endpoint.
 public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>> {
 
     Context mContext;
@@ -72,7 +73,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
             if(buffer.length() == 0)
                 return null;
             jsonString= buffer.toString();
-            Log.v("json string",jsonString);
+            //Log.v("json string",jsonString);
 
 
 
@@ -93,7 +94,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
         }
         try {
             getReviewDataFromJson(jsonString,params[0]);
-            Log.v("Data Sent", String.valueOf(params[0])+jsonString);
+            //Log.v("Data Sent", String.valueOf(params[0])+jsonString);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -102,15 +103,18 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
         return null;
     }
 
+
+    //This method is used to get appropriate review data from Json string received.
     public void getReviewDataFromJson(String jsonString, int movieId) throws JSONException {
 
+        //Field available in JSON strings
         final String TMDB_REVIEW_RESULT="results";
         final String TMDB_REVIEW_AUTHOR="author";
         final String TMDB_REVIEW_CONTENT="content";
 
         if(jsonString!=null)
         {
-            Log.v("Json Reveived",jsonString);
+            //Log.v("Json Reveived",jsonString);
             JSONObject object= new JSONObject(jsonString);
             JSONArray result= object.getJSONArray(TMDB_REVIEW_RESULT);
             Vector<ContentValues> valuesVector= new Vector<>(result.length());
@@ -118,9 +122,16 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
             for(int i=0;i<result.length();i++)
             {
                 JSONObject review= result.getJSONObject(i);
+
+                //Getting the author name
                 String author = review.getString(TMDB_REVIEW_AUTHOR);
+
+                //Getting the review by author
                 String content= review.getString(TMDB_REVIEW_CONTENT);
-                Log.v("Data",author+content);
+
+                //Log.v("Data",author+content);
+
+                //Putting the review data into content values.
                 ContentValues values= new ContentValues();
                 values.put(MovieContract.ReviewEntry.COL_REVIEW_ID,movieId);
                 values.put(MovieContract.ReviewEntry.COL_REVIEW_AUTHOR,author);
@@ -130,13 +141,13 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
                 String reviewData= author+"\n"+content;
                 mArrayListReview.add(reviewData);
             }
-            Log.v("Values Vector size", String.valueOf(valuesVector.size()));
+            //Log.v("Values Vector size", String.valueOf(valuesVector.size()));
             if(valuesVector.size()>0)
             {
                 ContentValues contentValues[]= new ContentValues[valuesVector.size()];
                 valuesVector.toArray(contentValues);
                 int returnCount=mContext.getContentResolver().bulkInsert(MovieContract.ReviewEntry.CONTENT_URI,contentValues);
-                Log.v("Return Count", String.valueOf(returnCount));
+                //Log.v("Return Count", String.valueOf(returnCount));
             }
 
 
@@ -145,7 +156,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
                     null,
                     null,
                     null);
-            Log.v("Review Cursor size", String.valueOf(cursor.getCount()));
+            //Log.v("Review Cursor size", String.valueOf(cursor.getCount()));
             assert cursor != null;
             valuesVector = new Vector<>(cursor.getCount());
             if (cursor.moveToFirst()) {
@@ -155,7 +166,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
                     valuesVector.add(cv);
                 } while (cursor.moveToNext());
             }
-            Log.d("Fetch ", "FetchReview Complete. " + valuesVector.size() + " Inserted");
+            //Log.d("Fetch ", "FetchReview Complete. " + valuesVector.size() + " Inserted");
 
         }
     }

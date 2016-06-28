@@ -12,7 +12,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -82,12 +81,8 @@ public  class MovieFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
     public void movieDataUpdate() {
-
-
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
         fetchMovieTask.execute(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular"));
-
-
     }
 
 
@@ -109,7 +104,7 @@ public  class MovieFragment extends Fragment implements LoaderManager.LoaderCall
                     Intent intent= new Intent(getActivity(),DetailActivity.class)
                             .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri(cursor.getInt(COL_MOVIE_ID)));
 
-                    Log.v("Movie ID", String.valueOf(cursor.getInt(COL_MOVIE_ID)));
+                    //Log.v("Movie ID", String.valueOf(cursor.getInt(COL_MOVIE_ID)));
                     startActivity(intent);
                 }
             }

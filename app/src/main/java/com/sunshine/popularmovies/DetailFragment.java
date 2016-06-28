@@ -145,7 +145,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mUri = getActivity().getIntent().getData();
-        Log.v("Uri Received", String.valueOf(mUri));
+        //Log.v("Uri Received", String.valueOf(mUri));
 
         mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
@@ -187,6 +187,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+        Log.v("Loader Id", String.valueOf(loader.getId()));
         switch (loader.getId()) {
             case LOADER_ID:
                 if (!data.moveToFirst()) {
@@ -214,6 +215,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .placeholder(R.drawable.placeholder)
                         .error(R.drawable.placeholder_error)
                         .into(mPoster);
+                break;
             case REVIEW_LOADER_ID:
                 ListView reviewListView = (ListView) getView().findViewById(R.id.review_list_view);
 
@@ -223,17 +225,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         String author = data.getString(COL_REVIEW_AUTHOR);
                         String content = data.getString(COL_REVIEW_CONTENT);
                         String resultReview = author + "\n" + content;
-                        Log.v("Review",resultReview);
+                        //Log.v("Review",resultReview);
                         mArrayListReview.add(resultReview);
                     } while (data.moveToNext());
                 }
-                Log.v("Review ArrayList", String.valueOf(mArrayListReview));
+                //Log.v("Review ArrayList", String.valueOf(mArrayListReview));
                 mArrayAdapterReview = new ArrayAdapter<>(getContext(),
                         R.layout.list_item_review,
                         R.id.list_item_review_textView,
                         mArrayListReview);
                 reviewListView.setAdapter(mArrayAdapterReview);
+
+                //http://stackoverflow.com/questions/3495890/how-can-i-put-a-listview-into-a-scrollview-without-it-collapsing
+                Utility.setListViewHeightBasedOnChildren(reviewListView);
                 mArrayAdapterReview.notifyDataSetChanged();
+                break;
 
             case TRAILER_LOADER_ID:
                 ListView trailerListView = (ListView) getView().findViewById(R.id.trailer_list_view);
@@ -247,14 +253,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         mArrayListTrailer.add(resultTrailer);
                     } while (data.moveToNext());
                 }
-                Log.v("Trailer ArrayList", String.valueOf(mArrayListTrailer));
+                //Log.v("Trailer ArrayList", String.valueOf(mArrayListTrailer));
 
                 mArrayAdapterTrailer = new ArrayAdapter<>(getContext(),
                         R.layout.list_item_trailer,
                         R.id.list_item_trailer_textView,
                         mArrayListTrailer);
                 trailerListView.setAdapter(mArrayAdapterTrailer);
+
+                //http://stackoverflow.com/questions/3495890/how-can-i-put-a-listview-into-a-scrollview-without-it-collapsing
+                Utility.setListViewHeightBasedOnChildren(trailerListView);
                 mArrayAdapterTrailer.notifyDataSetChanged();
+                break;
+            default:
+                throw new UnsupportedOperationException("Unknown Loader"+loader.getId());
+
 
 
         }

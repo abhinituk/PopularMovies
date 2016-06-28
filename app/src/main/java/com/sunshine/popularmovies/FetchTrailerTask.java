@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 
 import com.sunshine.popularmovies.data.MovieContract;
 
@@ -26,6 +25,8 @@ import java.util.Vector;
 /**
  * Created by Abhishek on 23-06-2016.
  */
+
+//This class is used to fetch trailer by making a request to  /movie/{id}/videos endpoint.
 public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>> {
 
     ArrayList<String> mArrayListTrailer = new ArrayList<>();
@@ -71,7 +72,7 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
             if (buffer.length() == 0)
                 return null;
             jsonString = buffer.toString();
-            Log.v("Trailer Json Data", jsonString);
+            //Log.v("Trailer Json Data", jsonString);
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
@@ -125,7 +126,7 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
                 ContentValues contentValues[] = new ContentValues[valuesVector.size()];
                 valuesVector.toArray(contentValues);
                 int returnCount = mContext.getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI, contentValues);
-                Log.v("Return Count", String.valueOf(returnCount));
+                //Log.v("Return Count", String.valueOf(returnCount));
             }
 
             Cursor cursor = mContext.getContentResolver().query(MovieContract.TrailerEntry.CONTENT_URI,
@@ -134,7 +135,7 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
                     null,
                     null);
             assert cursor != null;
-            Log.v("Trailer Cursor size", String.valueOf(cursor.getCount()));
+            //Log.v("Trailer Cursor size", String.valueOf(cursor.getCount()));
 
             valuesVector = new Vector<>(cursor.getCount());
             if (cursor.moveToFirst()) {
@@ -144,7 +145,7 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
                     valuesVector.add(cv);
                 } while (cursor.moveToNext());
             }
-            Log.d("FetchTrailerTask", "FetchTrailerTask Complete. " + valuesVector.size() + " Inserted");
+            //Log.d("FetchTrailerTask", "FetchTrailerTask Complete. " + valuesVector.size() + " Inserted");
 
 
         }

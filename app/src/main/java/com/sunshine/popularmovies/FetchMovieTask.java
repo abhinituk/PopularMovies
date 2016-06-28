@@ -81,7 +81,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
             }
             movieJsonStr = buffer.toString();
-            Log.v("Movie Data",movieJsonStr);
+            //Log.v("Movie Data",movieJsonStr);
 
         } catch (IOException e) {
             Log.e("MovieData Fragment", "Error ", e);
@@ -169,7 +169,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
                         cVector.add(cv);
                     } while (cursor.moveToNext());
                 }
-                Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVector.size() + " Inserted");
+                //Log.d(LOG_TAG, "FetchWeatherTask Complete. " + cVector.size() + " Inserted");
 
 
 
