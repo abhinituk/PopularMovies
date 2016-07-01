@@ -29,6 +29,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     String DETAIL_URI = "URI";
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
+    private static final int FAVOURITE_LOADER_ID=1;
     static RecyclerView mRecycledGridView;
     RecyclerView.LayoutManager mLayoutManager;
 
