@@ -99,7 +99,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             }
         }
         try {
-            getMovieDatafromJson(movieJsonStr);
+            getMovieDatafromJson(movieJsonStr,params[0]);
         } catch (Exception e) {
             Log.e("Error", e.getMessage(), e);
             e.printStackTrace();
@@ -108,7 +108,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     }
 
 
-    private void getMovieDatafromJson(String movieJsonStr) throws JSONException {
+    private void getMovieDatafromJson(String movieJsonStr,String pref) throws JSONException {
 
         final String TMDB_POSTER_PATH = "poster_path";
         final String TMDB_OVERVIEW = "overview";
@@ -147,6 +147,12 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POPULARITY, popularity);
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_COUNT, vote_count);
+                    movieValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE,0);
+                    if(pref.equals("popular"))
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_FLAG,"popular");
+                    else if (pref.equals("top_rated"))
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_FLAG,"top_rated");
+
                     cVector.add(movieValues);
                 }
                 if (cVector.size() > 0) {

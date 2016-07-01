@@ -61,6 +61,12 @@ public class MovieContract {
         //vote average is used in detail fragment
         public static final String COLUMN_MOVIE_VOTE_AVG="vote_average";
 
+        //favourite
+        public static final String COLUMN_FAVOURITE="favourite";
+
+        //flag used for knowing whether movie is top rated or popular
+        public static final String COLUMN_FLAG="flag";
+
         public static Uri buildMovieUri(long id)
         {
             return ContentUris.withAppendedId(CONTENT_URI,id);

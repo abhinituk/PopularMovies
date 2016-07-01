@@ -12,30 +12,37 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.GridView;
 
 import com.sunshine.popularmovies.data.MovieContract;
 
 
-public  class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    String DETAIL_URI="URI";
+public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+    String DETAIL_URI = "URI";
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
-    static GridView gridView;
+    static RecyclerView mRecycledGridView;
+    RecyclerView.LayoutManager mLayoutManager;
 
-    private static final String[] MOVIE_COLUMN= {MovieContract.MovieEntry._ID
-                                                    , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
-                                                    , MovieContract.MovieEntry.COLUMN_MOVIE_ID};
-    static final int COL_ID=0;
-    static final int COL_POSTER_PATH=1;
-    static final int COL_MOVIE_ID=2;
+    private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
+            , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
+            , MovieContract.MovieEntry.COLUMN_MOVIE_ID,
+            MovieContract.MovieEntry.COLUMN_FLAG,
+            MovieContract.MovieEntry.COLUMN_FAVOURITE};
+    static final int COL_ID = 0;
+    static final int COL_POSTER_PATH = 1;
+    static final int COL_MOVIE_ID = 2;
+    static final int COL_FLAG = 3;
+    static final int COL_FAVOURITE = 4;
+//    String oldSortPref, newSortPref;
 
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.
@@ -74,6 +81,13 @@ public  class MovieFragment extends Fragment implements LoaderManager.LoaderCall
 
 
     @Override
+    public void onResume() {
+        super.onResume();
+        getLoaderManager().restartLoader(LOADER_ID, null, this);
+    }
+
+
+    @Override
     public void onStart() {
         super.onStart();
         movieDataUpdate();
@@ -82,7 +96,10 @@ public  class MovieFragment extends Fragment implements LoaderManager.LoaderCall
 
     public void movieDataUpdate() {
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
-        fetchMovieTask.execute(PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular"));
+        String pref= PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
+
+        if(!pref.equals("favourite"))
+            fetchMovieTask.execute(pref);
     }
 
 
@@ -91,26 +108,24 @@ public  class MovieFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        gridView = (GridView) rootView.findViewById(R.id.grid_view_fragment);
-        mCustomMovieAdapter = new CustomMovieAdapter(getActivity(), null, 0);
-        gridView.setAdapter(mCustomMovieAdapter);
+        //gridView = (GridView) rootView.findViewById(R.id.grid_view_fragment);
 
-        gridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mRecycledGridView = (RecyclerView) rootView.findViewById(R.id.recycled_grid_view);
+        mRecycledGridView.setHasFixedSize(true);
+
+        mLayoutManager = new GridLayoutManager(getContext(), 2);
+        mRecycledGridView.setLayoutManager(mLayoutManager);
+
+        mCustomMovieAdapter = new CustomMovieAdapter(getActivity(), new CustomMovieAdapter.CustomMovieAdapterOnClickHandler() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Cursor cursor = (Cursor) parent.getItemAtPosition(position);
-                if(cursor!=null)
-                {
-                    Intent intent= new Intent(getActivity(),DetailActivity.class)
-                            .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri(cursor.getInt(COL_MOVIE_ID)));
+            public void onClick(int movieId, CustomMovieAdapter.ViewHolder vh) {
+                Intent intent = new Intent(getActivity(), DetailActivity.class)
+                        .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
 
-                    //Log.v("Movie ID", String.valueOf(cursor.getInt(COL_MOVIE_ID)));
-                    startActivity(intent);
-                }
+                startActivity(intent);
             }
         });
-
-
+        mRecycledGridView.setAdapter(mCustomMovieAdapter);
         return rootView;
     }
 
@@ -125,12 +140,27 @@ public  class MovieFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
+        //movie.flag=?
+        final String movieWithFlag = MovieContract.MovieEntry.COLUMN_FLAG + "=?";
 
-        return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
-                MOVIE_COLUMN,
-                null,
-                null,
-                null);
+        //movie.favourite
+        final String movieMarkedFavourite = MovieContract.MovieEntry.COLUMN_FAVOURITE + "=?";
+
+        String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
+        Log.v("Flag", pref);
+        if (pref.equals("favourite"))
+            return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
+                    MOVIE_COLUMN,
+                    movieMarkedFavourite,
+                    new String[]{"1"},
+                    null);
+        else
+
+            return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
+                    MOVIE_COLUMN,
+                    movieWithFlag,
+                    new String[]{pref},
+                    null);
     }
 
 

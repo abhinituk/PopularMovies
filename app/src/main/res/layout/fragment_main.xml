@@ -4,14 +4,10 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <GridView
-        android:id="@+id/grid_view_fragment"
-        android:layout_width="wrap_content"
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycled_grid_view"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:numColumns="2"
-        android:columnWidth="120dp"
-        android:verticalSpacing="10dp"
-        android:horizontalSpacing="10dp"
-        android:stretchMode="spacingWidthUniform"/>
+        android:scrollbars="vertical"/>
 
 </FrameLayout>

@@ -1,11 +1,13 @@
 package com.sunshine.popularmovies;
 
 
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -18,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -50,7 +53,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieContract.MovieEntry.COLUMN_MOVIE_RELEASE_DATE,
             MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
             MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_AVG,
-            MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_COUNT};
+            MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_COUNT,
+            MovieContract.MovieEntry.COLUMN_FAVOURITE};
 
     private static int COL_ID = 0;
     private static int COL_MOVIE_ID = 1;
@@ -61,6 +65,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static int COL_MOVIE_TITLE = 6;
     private static int COL_VOTE_AVG = 7;
     private static int COL_VOTE_COUNT = 8;
+    private static int COL_FAVOURITE=9;
 
     private static String[] REVIEW_COLUMN = {
             MovieContract.ReviewEntry._ID,
@@ -89,7 +94,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     Uri mUri;
 
-    int mMovieId;
+    int mMovieId,favourite;
+
+    //movie.movie_id=?
+    final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -149,6 +157,50 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
+
+        final Button favouriteButton = (Button) view.findViewById(R.id.button);
+        favouriteButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Cursor cursor = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                        DETAIL_COLUMN,
+                        movieWithMovieId,
+                        new String[]{String.valueOf(mMovieId)}, null);
+
+                assert cursor != null;
+                if(cursor.moveToFirst()){
+                    favourite = cursor.getInt(COL_FAVOURITE);
+                }
+
+                if (favourite == 0) {
+                    ContentValues cv = new ContentValues();
+                    cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 1);
+                    int markedFavourite = getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
+                            cv,
+                            movieWithMovieId,
+                            new String[]{String.valueOf(mMovieId)});
+
+
+                    if(markedFavourite!=0)
+                        Snackbar.make(v, "Movie Marked As Favourite "+markedFavourite, Snackbar.LENGTH_LONG).show();
+
+                }
+                else{
+                    ContentValues cv = new ContentValues();
+                    cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 0);
+                    int unmarkedFavourite= getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
+                            cv,
+                            movieWithMovieId,
+                            new String[]{String.valueOf(mMovieId)});
+                    if (unmarkedFavourite!=0)
+                        Snackbar.make(v, "Movie Not Marked As Favourite "+unmarkedFavourite, Snackbar.LENGTH_LONG).show();
+
+                }
+
+
+            }
+        });
 
 
         return view;
@@ -266,14 +318,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 mArrayAdapterTrailer.notifyDataSetChanged();
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown Loader"+loader.getId());
-
+                throw new UnsupportedOperationException("Unknown Loader" + loader.getId());
 
 
         }
     }
-
-
 
 
     @Override
