@@ -2,14 +2,22 @@ package com.sunshine.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.sunshine.popularmovies.data.MovieContract;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 
 public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.ViewHolder> {
 
@@ -29,7 +37,7 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
 
     public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch) {
         this.mContext = context;
-        this.mCustomMovieAdapterOnClickHandler= ch;
+        this.mCustomMovieAdapterOnClickHandler = ch;
     }
 
 
@@ -42,13 +50,13 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
         return mCursor;
     }
 
-    public  class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         final ImageView poster;
         View mView;
 
         ViewHolder(View view) {
             super(view);
-            mView=view;
+            mView = view;
             poster = (ImageView) view.findViewById(R.id.grid_item_imageview);
             view.setOnClickListener(this);
         }
@@ -57,14 +65,13 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
         public void onClick(View v) {
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
-            int movieId= mCursor.getInt(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
-            mCustomMovieAdapterOnClickHandler.onClick(movieId,this);
+            int movieId = mCursor.getInt(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
+            mCustomMovieAdapterOnClickHandler.onClick(movieId, this);
 
         }
     }
 
-    public static interface  CustomMovieAdapterOnClickHandler
-    {
+    public static interface CustomMovieAdapterOnClickHandler {
         void onClick(int movieId, ViewHolder vh);
     }
 
@@ -79,28 +86,52 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
+        String url = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
+        final int id = mCursor.getInt(mCursor.getColumnIndex(MovieContract.MovieEntry._ID));
 
+        Target target = new Target() {
+            @Override
+            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                try {
+                    String root = mContext.getFilesDir().toString();
+                    File myDir = new File(root + "/images");
+                    if (!myDir.exists())
+                        myDir.mkdirs();
+
+                    Log.v("Created", String.valueOf(myDir.mkdir()));
+
+                    String name = id + ".jpg";
+                    myDir = new File(myDir, name);
+                    FileOutputStream outputStream = new FileOutputStream(myDir);
+
+                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                    outputStream.flush();
+                    outputStream.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onBitmapFailed(Drawable errorDrawable) {
+
+            }
+
+            @Override
+            public void onPrepareLoad(Drawable placeHolderDrawable) {
+
+            }
+        };
         Picasso.with(mContext)
-                .load(mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH)))
+                .load(url)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder_error)
-                .into(holder.poster);
-//        holder.mView.setOnClickListener(new View.OnClickListener(){
-//            @Override
-//            public void onClick(View v) {
-//                if(mCursor!=null)
-//                {
-//                    Intent intent= new Intent(mContext,DetailActivity.class)
-//                            .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri
-//                                    (mCursor.getInt(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID))));
-//                    mContext.startActivity(intent);
-//                }
-//            }
-//        });
+                .into(target);
+        holder.poster.setTag(target);
 
 
     }
-
 
 
 //    @Override

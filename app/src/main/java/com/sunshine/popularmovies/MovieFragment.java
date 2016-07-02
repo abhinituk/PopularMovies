@@ -98,9 +98,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void movieDataUpdate() {
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
         String pref= PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
-
-        if(!pref.equals("favourite"))
-            fetchMovieTask.execute(pref);
+        fetchMovieTask.execute(pref);
     }
 
 

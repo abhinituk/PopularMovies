@@ -138,6 +138,8 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
                     double popularity = movieData.getDouble(TMDB_POPULARITY);
                     double vote_count = movieData.getDouble(TMDB_VOTE_COUNT);
 
+                    //byte[] blob= urlToImageBLOB(poster_path);
+
                     ContentValues movieValues = new ContentValues();
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH, poster_path);
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW, overview);
@@ -185,5 +187,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
             }
         }
     }
+
+    
 }
 
