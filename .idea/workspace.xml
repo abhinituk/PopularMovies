@@ -29,24 +29,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8243ca33-0f09-428c-ac37-9e9a8b5d8e17" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/.idea/libraries/glide_3_7_0.xml" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/FavouriteFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/cache.properties.lock" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/cache.properties.lock" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileHashes.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileHashes.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileSnapshots.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/fileSnapshots.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/outputFileStates.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/outputFileStates.bin" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/taskArtifacts.bin" afterPath="$PROJECT_DIR$/.gradle/2.10/taskArtifacts/taskArtifacts.bin" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/app.iml" afterPath="$PROJECT_DIR$/app/app.iml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/build.gradle" afterPath="$PROJECT_DIR$/app/build.gradle" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/CustomMovieAdapter.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/CustomMovieAdapter.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/DetailFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/DetailFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/FetchMovieTask.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/FetchMovieTask.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/MainActivity.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/MainActivity.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/MovieFragment.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/MovieFragment.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/Utility.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/Utility.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/data/MovieDbHelper.java" afterPath="$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/data/MovieDbHelper.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" afterPath="$PROJECT_DIR$/app/src/main/res/values/strings.xml" />
     </list>
     <ignored path="Popular Movies.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -162,8 +145,8 @@
       <file leaf-file-name="DetailFragment.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/DetailFragment.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="3.132107">
-              <caret line="272" column="16" selection-start-line="272" selection-start-column="16" selection-end-line="272" selection-end-column="16" />
+            <state vertical-scroll-proportion="1.909699">
+              <caret line="272" column="0" selection-start-line="272" selection-start-column="0" selection-end-line="272" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -2883,7 +2866,13 @@
       <option name="project" value="LOCAL" />
       <updated>1467452869540</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="Favourite column not updated properly.">
+      <created>1467529826775</created>
+      <option name="number" value="00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1467529826775</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="TestHistory">
@@ -3008,7 +2997,8 @@
     <MESSAGE value="Enter Your API Key" />
     <MESSAGE value="Error Resolved regarding SQLException" />
     <MESSAGE value="Issue implementing Target Interface" />
-    <option name="LAST_COMMIT_MESSAGE" value="Issue implementing Target Interface" />
+    <MESSAGE value="Favourite column not updated properly." />
+    <option name="LAST_COMMIT_MESSAGE" value="Favourite column not updated properly." />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -3428,8 +3418,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/app/src/main/java/com/sunshine/popularmovies/DetailFragment.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="3.132107">
-          <caret line="272" column="16" selection-start-line="272" selection-start-column="16" selection-end-line="272" selection-end-column="16" />
+        <state vertical-scroll-proportion="1.909699">
+          <caret line="272" column="0" selection-start-line="272" selection-start-column="0" selection-end-line="272" selection-end-column="0" />
           <folding />
         </state>
       </provider>
