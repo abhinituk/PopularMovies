@@ -28,13 +28,13 @@
     <string-array name="entries">
         <item>@string/label_popularity</item>
         <item>@string/label_top_rated</item>
-        <!--<item>@string/label_favourite</item>-->
+        <item>@string/label_favourite</item>
 
     </string-array>
 
     <string-array name="entryValue">
         <item>@string/popularity</item>
         <item>@string/top_rated</item>
-        <!--<item>@string/favourite</item>-->
+        <item>@string/favourite</item>
     </string-array>
 </resources>

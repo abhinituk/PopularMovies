@@ -130,11 +130,17 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject movieData = array.getJSONObject(i);
                     String poster_path = BASE_URL + movieData.getString(TMDB_POSTER_PATH);
+                    int movieId = movieData.getInt(MOVIE_ID);
+                    //String path= Utility.downloadImagesToIntenalStorage(mContext,poster_path,movieId)+"";
+                    //Log.v("Path",poster_path);
+
+
+
                     String overview = movieData.getString(TMDB_OVERVIEW);
                     String title = movieData.getString(TMDB_TITLE);
                     double vote_average = movieData.getDouble(TMDB_VOTE_AVERAGE);
                     String release_date = movieData.getString(TMDB_RELEASE_DATE);
-                    int movieId = movieData.getInt(MOVIE_ID);
+
                     double popularity = movieData.getDouble(TMDB_POPULARITY);
                     double vote_count = movieData.getDouble(TMDB_VOTE_COUNT);
 

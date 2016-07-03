@@ -2,22 +2,14 @@ package com.sunshine.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.sunshine.popularmovies.data.MovieContract;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.ViewHolder> {
 
@@ -86,50 +78,13 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
-        String url = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
-        final int id = mCursor.getInt(mCursor.getColumnIndex(MovieContract.MovieEntry._ID));
+        String path = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
 
-        Target target = new Target() {
-            @Override
-            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                try {
-                    String root = mContext.getFilesDir().toString();
-                    File myDir = new File(root + "/images");
-                    if (!myDir.exists())
-                        myDir.mkdirs();
-
-                    Log.v("Created", String.valueOf(myDir.mkdir()));
-
-                    String name = id + ".jpg";
-                    myDir = new File(myDir, name);
-                    FileOutputStream outputStream = new FileOutputStream(myDir);
-
-                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-                    outputStream.flush();
-                    outputStream.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onBitmapFailed(Drawable errorDrawable) {
-
-            }
-
-            @Override
-            public void onPrepareLoad(Drawable placeHolderDrawable) {
-
-            }
-        };
         Picasso.with(mContext)
-                .load(url)
+                .load(path)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder_error)
-                .into(target);
-        holder.poster.setTag(target);
-
+                .into(holder.poster);
 
     }
 

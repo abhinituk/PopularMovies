@@ -1,26 +1,66 @@
 package com.sunshine.popularmovies;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.facebook.stetho.Stetho;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         if(savedInstanceState == null) {
+            String pref= PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
-            getSupportFragmentManager().beginTransaction().add(R.id.container,new MovieFragment()).commit();
+            if(!pref.equals("favourite"))
+                getSupportFragmentManager().beginTransaction().add(R.id.container,new MovieFragment()).commit();
+            else
+                getSupportFragmentManager().beginTransaction().add(R.id.container,new FavouriteFragment()).commit();
+
 
         }
         Stetho.initializeWithDefaults(this);
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        String pref= PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
+
+        if(!pref.equals("favourite"))
+            getSupportFragmentManager().beginTransaction().add(R.id.container,new MovieFragment()).commit();
+        else
+            getSupportFragmentManager().beginTransaction().add(R.id.container,new FavouriteFragment()).commit();
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.v("Main Activity", "onResume Called");
+        String pref= PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
+        if (!pref.equals("favourite"))
+            getSupportFragmentManager().beginTransaction().replace(R.id.container,new MovieFragment()).commit();
+        else
+            getSupportFragmentManager().beginTransaction().replace(R.id.container,new FavouriteFragment()).commit();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.v("Main Activity","On Pause Called");
+    }
+
+
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -37,5 +77,10 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
     }
 }

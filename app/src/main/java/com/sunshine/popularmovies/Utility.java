@@ -27,4 +27,47 @@ public class Utility {
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
     }
+//    public static String downloadImagesToIntenalStorage(final Context context, String posterPath, final int movieId)
+//    {
+//        Target target = new Target() {
+//            @Override
+//            public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+//                try {
+//                    String root = context.getFilesDir().toString();
+//                    File myDir = new File(root + "/images");
+//                    if (!myDir.exists())
+//                        myDir.mkdirs();
+//
+//                    Log.v("Created", String.valueOf(myDir.exists()));
+//
+//                    String name = movieId + ".jpg";
+//                    myDir = new File(myDir, name);
+//                    FileOutputStream outputStream = new FileOutputStream(myDir);
+//
+//                    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+//                    outputStream.flush();
+//                    outputStream.close();
+//
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onBitmapFailed(Drawable errorDrawable) {
+//
+//            }
+//
+//            @Override
+//            public void onPrepareLoad(Drawable placeHolderDrawable) {
+//
+//            }
+//        };
+//        Picasso.with(context)
+//                .load(posterPath)
+//                .into(target);
+//        Log.v("Target", String.valueOf(target));
+//
+//        return context.getFilesDir().toString() +"/images/"+movieId+".jpg";
+//    }
 }

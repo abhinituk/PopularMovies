@@ -198,8 +198,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
                 }
 
+                cursor.close();
 
             }
+
         });
 
 
@@ -267,6 +269,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .placeholder(R.drawable.placeholder)
                         .error(R.drawable.placeholder_error)
                         .into(mPoster);
+
+
+
                 break;
             case REVIEW_LOADER_ID:
                 ListView reviewListView = (ListView) getView().findViewById(R.id.review_list_view);

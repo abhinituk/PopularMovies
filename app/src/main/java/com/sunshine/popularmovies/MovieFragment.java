@@ -26,10 +26,8 @@ import com.sunshine.popularmovies.data.MovieContract;
 
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
-    String DETAIL_URI = "URI";
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
-    private static final int FAVOURITE_LOADER_ID=1;
     static RecyclerView mRecycledGridView;
     RecyclerView.LayoutManager mLayoutManager;
 
@@ -84,7 +82,23 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onResume() {
         super.onResume();
+//        String pref= PreferenceManager.getDefaultSharedPreferences(getContext()).getString("sort_by", "popular");
+
+//        if(!pref.equals("favourite"))
+//        {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
+//            getActivity().getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .replace(R.id.container,new MovieFragment())
+//                    .commit();
+//        }
+
+//        else
+//            getActivity().getSupportFragmentManager()
+//                    .beginTransaction()
+//                    .replace(R.id.container,new FavouriteFragment())
+//                    .commit();
+
     }
 
 
@@ -97,8 +111,11 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
     public void movieDataUpdate() {
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
-        String pref= PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
-        fetchMovieTask.execute(pref);
+        String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
+        if (!pref.equals("favourite"))
+            fetchMovieTask.execute(pref);
+//        else
+//            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container,new FavouriteFragment()).commit();
     }
 
 
