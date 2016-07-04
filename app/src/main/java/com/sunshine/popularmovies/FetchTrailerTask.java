@@ -28,8 +28,6 @@ import java.util.Vector;
 
 //This class is used to fetch trailer by making a request to  /movie/{id}/videos endpoint.
 public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>> {
-
-    ArrayList<String> mArrayListTrailer = new ArrayList<>();
     Context mContext;
 
     public FetchTrailerTask(Context context) {
@@ -109,18 +107,20 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
             for (int i = 0; i < result.length(); i++) {
                 JSONObject trailer = result.getJSONObject(i);
                 String key = "https://www.youtube.com/watch?v=" + trailer.getString(TMDB_TRAILER_KEY);
+
+                String thumbnailImage="http://img.youtube.com/vi/"+trailer.getString(TMDB_TRAILER_KEY)+"/default.jpg";
                 String name = trailer.getString(TMDB_TRAILER_NAME);
 
                 ContentValues values = new ContentValues();
                 values.put(MovieContract.TrailerEntry.COL_TRAILER_ID, movieId);
                 values.put(MovieContract.TrailerEntry.COL_TRAILER_NAME, name);
                 values.put(MovieContract.TrailerEntry.COL_TRAILER_SOURCE, key);
+                values.put(MovieContract.TrailerEntry.COL_TRAILER_THUMBNAIL,thumbnailImage);
 
                 valuesVector.add(values);
 
-                String trailerData = key + "\n" + name;
 
-                mArrayListTrailer.add(trailerData);
+                //mArrayListTrailer.add(trailerData);
             }
             if (valuesVector.size() > 0) {
                 ContentValues contentValues[] = new ContentValues[valuesVector.size()];

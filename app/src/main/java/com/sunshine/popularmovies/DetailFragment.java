@@ -1,17 +1,19 @@
 package com.sunshine.popularmovies;
 
 
-import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.view.MenuItemCompat;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.ShareActionProvider;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -20,9 +22,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -30,19 +30,25 @@ import com.sunshine.popularmovies.data.MovieContract;
 
 import java.util.ArrayList;
 
-/**
- * Created by Abhishek on 13-05-2016.
- */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private final int LOADER_ID = 100;
     private final int REVIEW_LOADER_ID = 200;
     private final int TRAILER_LOADER_ID = 300;
 
-    static ArrayAdapter<String> mArrayAdapterTrailer;
+
     static ArrayAdapter<String> mArrayAdapterReview;
     static ArrayList<String> mArrayListReview;
-    static ArrayList<String> mArrayListTrailer;
+
+    //CustomReviewAdapter
+    CustomReviewAdapter mCustomReviewAdapter;
+    RecyclerView mRecyclerViewReview;
+    RecyclerView.LayoutManager mLayoutManagerReview;
+
+    //CustomTrailerAdapter
+    CustomTrailerAdapter mCustomTrailerAdapter;
+    RecyclerView mRecyclerViewTrailer;
+    RecyclerView.LayoutManager mLayoutManagerTrailer;
 
     private static String[] DETAIL_COLUMN = {
             MovieContract.MovieEntry._ID,
@@ -65,7 +71,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static int COL_MOVIE_TITLE = 6;
     private static int COL_VOTE_AVG = 7;
     private static int COL_VOTE_COUNT = 8;
-    private static int COL_FAVOURITE=9;
+    private static int COL_FAVOURITE = 9;
 
     private static String[] REVIEW_COLUMN = {
             MovieContract.ReviewEntry._ID,
@@ -83,18 +89,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieContract.TrailerEntry._ID,
             MovieContract.TrailerEntry.COL_TRAILER_ID,
             MovieContract.TrailerEntry.COL_TRAILER_NAME,
-            MovieContract.TrailerEntry.COL_TRAILER_SOURCE
+            MovieContract.TrailerEntry.COL_TRAILER_SOURCE,
+            MovieContract.TrailerEntry.COL_TRAILER_THUMBNAIL
     };
 
     private static int COL_TRAILER_ID = 0;
     private static int COL_TRAILER_MOVIE_ID = 1;
     private static int COL_TRAILER_NAME = 2;
     private static int COL_TRAILER_SOURCE = 3;
+    private static int COL_TRAILER_THUMBNAIL = 4;
 
 
     Uri mUri;
-
-    int mMovieId,favourite;
+    private ShareActionProvider mShareActionProvider;
+    int mMovieId, favourite;
 
     //movie.movie_id=?
     final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
@@ -134,76 +142,114 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.detail, menu);
+        inflater.inflate(R.menu.detailfragment, menu);
+        // Retrieve the share menu item
+        MenuItem menuItem = menu.findItem(R.id.action_share);
+
+        // Get the provider and hold onto it to set/change the share intent.
+        mShareActionProvider = (ShareActionProvider) MenuItemCompat.getActionProvider(menuItem);
+
+        // If onLoadFinished happens before this, we can go ahead and set the share intent now.
+        if (mShareActionProvider!=null)
+            mShareActionProvider.setShareIntent(createShareMovieIntent());
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.action_settings) {
-            startActivity(new Intent(getActivity(), SettingsActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
+    //Creating the ShareActionProvider
+    private Intent createShareMovieIntent() {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+        shareIntent.setType("text/plain");
+        shareIntent.putExtra(Intent.EXTRA_TEXT, "Movie Data");
+        return shareIntent;
     }
+
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mUri = getActivity().getIntent().getData();
-        //Log.v("Uri Received", String.valueOf(mUri));
 
         mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
-        final Button favouriteButton = (Button) view.findViewById(R.id.button);
-        favouriteButton.setOnClickListener(new View.OnClickListener() {
+
+
+
+
+        //CustomTrailerAdapter
+        mRecyclerViewTrailer = (RecyclerView) view.findViewById(R.id.recycled_trailer_list_view);
+        mRecyclerViewTrailer.setHasFixedSize(true);
+
+        mLayoutManagerTrailer = new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false);
+        mRecyclerViewTrailer.setLayoutManager(mLayoutManagerTrailer);
+
+        mCustomTrailerAdapter = new CustomTrailerAdapter(getContext(), new CustomTrailerAdapter.CustomTrailerAdapterOnClickHandler() {
             @Override
-            public void onClick(View v) {
-
-                Cursor cursor = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
-                        DETAIL_COLUMN,
-                        movieWithMovieId,
-                        new String[]{String.valueOf(mMovieId)}, null);
-
-                assert cursor != null;
-                if(cursor.moveToFirst()){
-                    favourite = cursor.getInt(COL_FAVOURITE);
-                }
-
-                if (favourite == 0) {
-                    ContentValues cv = new ContentValues();
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 1);
-                    int markedFavourite = getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
-                            cv,
-                            movieWithMovieId,
-                            new String[]{String.valueOf(mMovieId)});
-
-
-                    if(markedFavourite!=0)
-                        Snackbar.make(v, "Movie Marked As Favourite "+markedFavourite, Snackbar.LENGTH_LONG).show();
-
-                }
-                else{
-                    ContentValues cv = new ContentValues();
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 0);
-                    int unmarkedFavourite= getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
-                            cv,
-                            movieWithMovieId,
-                            new String[]{String.valueOf(mMovieId)});
-                    if (unmarkedFavourite!=0)
-                        Snackbar.make(v, "Movie Not Marked As Favourite "+unmarkedFavourite, Snackbar.LENGTH_LONG).show();
-
-                }
-
-                cursor.close();
-
+            public void onClick(String videoSource, CustomTrailerAdapter.ViewHolder vh) {
+                Intent intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(videoSource));
+                startActivity(intent);
             }
-
         });
+        mRecyclerViewTrailer.setAdapter(mCustomTrailerAdapter);
 
+        //CustomReviewAdapter
+        mRecyclerViewReview = (RecyclerView) view.findViewById(R.id.recycled_review_list_view);
+        mRecyclerViewReview.setHasFixedSize(true);
+
+        mLayoutManagerReview = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        mRecyclerViewReview.setLayoutManager(mLayoutManagerReview);
+
+        mCustomReviewAdapter = new CustomReviewAdapter(getContext());
+        mRecyclerViewReview.setAdapter(mCustomReviewAdapter);
+
+
+
+//        final Button favouriteButton = (Button) view.findViewById(R.id.button);
+//        favouriteButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//                Cursor cursor = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+//                        DETAIL_COLUMN,
+//                        movieWithMovieId,
+//                        new String[]{String.valueOf(mMovieId)}, null);
+//
+//                assert cursor != null;
+//                if (cursor.moveToFirst()) {
+//                    favourite = cursor.getInt(COL_FAVOURITE);
+//                }
+//
+//                if (favourite == 0) {
+//                    ContentValues cv = new ContentValues();
+//                    cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 1);
+//                    int markedFavourite = getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
+//                            cv,
+//                            movieWithMovieId,
+//                            new String[]{String.valueOf(mMovieId)});
+//
+//
+//                    if (markedFavourite != 0)
+//                        Snackbar.make(v, "Movie Marked As Favourite " + markedFavourite, Snackbar.LENGTH_LONG).show();
+//
+//                } else {
+//                    ContentValues cv = new ContentValues();
+//                    cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 0);
+//                    int unmarkedFavourite = getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
+//                            cv,
+//                            movieWithMovieId,
+//                            new String[]{String.valueOf(mMovieId)});
+//                    if (unmarkedFavourite != 0)
+//                        Snackbar.make(v, "Movie Not Marked As Favourite " + unmarkedFavourite, Snackbar.LENGTH_LONG).show();
+//
+//                }
+//
+//                cursor.close();
+//
+//            }
+//
+//        });
+//
 
         return view;
     }
@@ -269,58 +315,27 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .placeholder(R.drawable.placeholder)
                         .error(R.drawable.placeholder_error)
                         .into(mPoster);
-
+                // If onCreateOptionsMenu has already happened, we need to update the share intent now.
+                if (mShareActionProvider != null) {
+                    mShareActionProvider.setShareIntent(createShareMovieIntent());
+                }
 
 
                 break;
             case REVIEW_LOADER_ID:
-                ListView reviewListView = (ListView) getView().findViewById(R.id.review_list_view);
-
-                mArrayListReview = new ArrayList<>();
-                if (data.moveToFirst()) {
-                    do {
-                        String author = data.getString(COL_REVIEW_AUTHOR);
-                        String content = data.getString(COL_REVIEW_CONTENT);
-                        String resultReview = author + "\n" + content;
-                        //Log.v("Review",resultReview);
-                        mArrayListReview.add(resultReview);
-                    } while (data.moveToNext());
+                mCustomReviewAdapter.swapCursor(data);
+                // If onCreateOptionsMenu has already happened, we need to update the share intent now.
+                if (mShareActionProvider != null) {
+                    mShareActionProvider.setShareIntent(createShareMovieIntent());
                 }
-                //Log.v("Review ArrayList", String.valueOf(mArrayListReview));
-                mArrayAdapterReview = new ArrayAdapter<>(getContext(),
-                        R.layout.list_item_review,
-                        R.id.list_item_review_textView,
-                        mArrayListReview);
-                reviewListView.setAdapter(mArrayAdapterReview);
-
-                //http://stackoverflow.com/questions/3495890/how-can-i-put-a-listview-into-a-scrollview-without-it-collapsing
-                Utility.setListViewHeightBasedOnChildren(reviewListView);
-                mArrayAdapterReview.notifyDataSetChanged();
                 break;
 
             case TRAILER_LOADER_ID:
-                ListView trailerListView = (ListView) getView().findViewById(R.id.trailer_list_view);
-                mArrayListTrailer = new ArrayList<>();
-                if (data.moveToFirst()) {
-                    do {
-                        String trailerName = data.getString(COL_TRAILER_NAME);
-                        String trailerSource = data.getString(COL_TRAILER_SOURCE);
-                        String resultTrailer = trailerName + "\n" + trailerSource;
-
-                        mArrayListTrailer.add(resultTrailer);
-                    } while (data.moveToNext());
+                mCustomTrailerAdapter.swapCursor(data);
+                // If onCreateOptionsMenu has already happened, we need to update the share intent now.
+                if (mShareActionProvider != null) {
+                    mShareActionProvider.setShareIntent(createShareMovieIntent());
                 }
-                //Log.v("Trailer ArrayList", String.valueOf(mArrayListTrailer));
-
-                mArrayAdapterTrailer = new ArrayAdapter<>(getContext(),
-                        R.layout.list_item_trailer,
-                        R.id.list_item_trailer_textView,
-                        mArrayListTrailer);
-                trailerListView.setAdapter(mArrayAdapterTrailer);
-
-                //http://stackoverflow.com/questions/3495890/how-can-i-put-a-listview-into-a-scrollview-without-it-collapsing
-                Utility.setListViewHeightBasedOnChildren(trailerListView);
-                mArrayAdapterTrailer.notifyDataSetChanged();
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Loader" + loader.getId());

@@ -36,12 +36,14 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
             , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
             , MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_FLAG,
-            MovieContract.MovieEntry.COLUMN_FAVOURITE};
+            MovieContract.MovieEntry.COLUMN_FAVOURITE,
+            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE};
     static final int COL_ID = 0;
     static final int COL_POSTER_PATH = 1;
     static final int COL_MOVIE_ID = 2;
     static final int COL_FLAG = 3;
     static final int COL_FAVOURITE = 4;
+
 //    String oldSortPref, newSortPref;
 
 

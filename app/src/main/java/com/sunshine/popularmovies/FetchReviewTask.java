@@ -138,8 +138,6 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
                 values.put(MovieContract.ReviewEntry.COL_REVIEW_CONTENT,content);
 
                 valuesVector.add(values);
-                String reviewData= author+"\n"+content;
-                mArrayListReview.add(reviewData);
             }
             //Log.v("Values Vector size", String.valueOf(valuesVector.size()));
             if(valuesVector.size()>0)

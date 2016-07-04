@@ -2,11 +2,13 @@ package com.sunshine.popularmovies;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.sunshine.popularmovies.data.MovieContract;
@@ -43,13 +45,18 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        CardView cardView;
+        TextView titleTextView;
         final ImageView poster;
         View mView;
 
         ViewHolder(View view) {
             super(view);
             mView = view;
-            poster = (ImageView) view.findViewById(R.id.grid_item_imageview);
+            cardView= (CardView) view.findViewById(R.id.grid_item_cardView);
+            poster = (ImageView) cardView.findViewById(R.id.grid_item_imageview);
+            titleTextView= (TextView) cardView.findViewById(R.id.grid_item_title_textView);
+
             view.setOnClickListener(this);
         }
 
@@ -63,7 +70,7 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
         }
     }
 
-    public static interface CustomMovieAdapterOnClickHandler {
+    public interface CustomMovieAdapterOnClickHandler {
         void onClick(int movieId, ViewHolder vh);
     }
 
@@ -71,7 +78,6 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.grid_item_movies, parent, false);
-
         return new ViewHolder(view);
     }
 
@@ -79,48 +85,16 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         String path = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
-
+        String title=mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE));
         Picasso.with(mContext)
                 .load(path)
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder_error)
                 .into(holder.poster);
 
+        holder.titleTextView.setText(title);
     }
 
-
-//    @Override
-//    public View getView(int position, View convertView, ViewGroup parent) {
-//        MovieData movieData= (MovieData) getItem(position);
-//        PosterImageViewHolder holder;
-//        if(convertView == null) {
-//            holder=new PosterImageViewHolder();
-//            convertView = LayoutInflater.from(mContext).inflate(R.layout.grid_item_movies,parent,false);
-//            holder.poster = (ImageView) convertView.findViewById(R.id.grid_item_imageview);
-//            convertView.setTag(holder);
-//        }
-//        else {
-//            holder = (PosterImageViewHolder) convertView.getTag();
-//        }
-//
-//        Picasso.with(mContext)
-//                .load(movieData.ImageUrl)
-//                .placeholder(R.drawable.placeholder)
-//                .error(R.drawable.placeholder_error)
-//                .into(holder.poster);
-//
-//        return convertView;
-//    }
-
-//    @Override
-//    public View newView(Context context, Cursor cursor, ViewGroup parent) {
-//
-//        View view = LayoutInflater.from(mContext).inflate(R.layout.grid_item_movies, parent, false);
-//        ViewHolder holder = new ViewHolder(view);
-//        view.setTag(holder);
-//
-//        return view;
-//    }
 
 //    @Override
 //    public void bindView(View view, Context context, Cursor cursor) {

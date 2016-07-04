@@ -35,12 +35,14 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
             , MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_FLAG,
-            MovieContract.MovieEntry.COLUMN_FAVOURITE};
+            MovieContract.MovieEntry.COLUMN_FAVOURITE,
+            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE};
     static final int COL_ID = 0;
     static final int COL_POSTER_PATH = 1;
     static final int COL_MOVIE_ID = 2;
     static final int COL_FLAG = 3;
     static final int COL_FAVOURITE = 4;
+    static final int COL_TITLE=5;
 //    String oldSortPref, newSortPref;
 
 
@@ -99,15 +101,25 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 //                    .replace(R.id.container,new FavouriteFragment())
 //                    .commit();
 
+        Log.v("Main Fragment","On Resume Called");
+
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
-        movieDataUpdate();
+        //movieDataUpdate();
+        Log.v("Main Fragment","On Start Called");
 
     }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.v("Main Fragment","On Pause Called");
+    }
+
 
     public void movieDataUpdate() {
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
@@ -163,14 +175,14 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         final String movieMarkedFavourite = MovieContract.MovieEntry.COLUMN_FAVOURITE + "=?";
 
         String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
-        Log.v("Flag", pref);
-        if (pref.equals("favourite"))
-            return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
-                    MOVIE_COLUMN,
-                    movieMarkedFavourite,
-                    new String[]{"1"},
-                    null);
-        else
+//        Log.v("Flag", pref);
+//        if (pref.equals("favourite"))
+//            return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
+//                    MOVIE_COLUMN,
+//                    movieMarkedFavourite,
+//                    new String[]{"1"},
+//                    null);
+//        else
 
             return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
                     MOVIE_COLUMN,

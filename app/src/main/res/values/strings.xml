@@ -24,6 +24,7 @@
     <string name="mark_as_favourite">Mark as favourite</string>
     <string name="mark_as_favourites">mark as favourite</string>
     <string name="mark_as_favouritess">Mark as favourite</string>
+    <string name="share">Share</string>
 
     <string-array name="entries">
         <item>@string/label_popularity</item>

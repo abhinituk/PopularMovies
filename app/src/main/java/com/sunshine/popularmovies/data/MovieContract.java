@@ -108,6 +108,9 @@ public class MovieContract {
         //Defining the trailer link
         public static final String COL_TRAILER_SOURCE="source";
 
+        //Defining the path for thumbnail images
+        public static final String COL_TRAILER_THUMBNAIL="thumbnail";
+
         public static Uri buildTrailerUri(long id)
         {
             return ContentUris.withAppendedId(CONTENT_URI,id);
