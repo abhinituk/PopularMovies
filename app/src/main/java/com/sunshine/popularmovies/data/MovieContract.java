@@ -46,6 +46,9 @@ public class MovieContract {
         //Poster Path is used to display the movie thumbnail
         public static final String COLUMN_MOVIE_POSTER_PATH="poster_path";
 
+        //Backdrop Path used in detail view
+        public static final String COLUMN_MOVIE_BACKDROP_PATH="backdrop_path";
+
         //Overview is used in detail view of particular movie
         public static final String COLUMN_MOVIE_OVERVIEW="overview";
 

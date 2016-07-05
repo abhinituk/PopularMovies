@@ -10,12 +10,13 @@
     app:cardPreventCornerOverlap="true"
     android:id="@+id/grid_item_trailer_cardView"
     app:cardElevation="@dimen/cardview_default_elevation"
-    android:layout_margin="4dp">
+    android:layout_margin="8dp">
 
     <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        tools:ignore="UseCompoundDrawables">
+        tools:ignore="UseCompoundDrawables"
+        android:padding="4dp">
 
         <ImageView
             android:layout_width="wrap_content"

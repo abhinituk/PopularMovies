@@ -8,17 +8,19 @@
     app:cardCornerRadius="@dimen/cardview_default_radius"
     app:cardElevation="@dimen/cardview_default_elevation"
     app:cardPreventCornerOverlap="true"
-    android:layout_margin="@dimen/activity_vertical_margin">
+    android:layout_margin="8dp">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="4dp">
         <TextView
             android:id="@+id/list_item_review_author_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
+
             android:textStyle="bold"/>
         <TextView
             android:layout_width="wrap_content"
