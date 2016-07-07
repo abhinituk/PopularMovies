@@ -1,5 +1,8 @@
 package com.sunshine.popularmovies.activity;
 
+import android.annotation.TargetApi;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -12,6 +15,10 @@ import com.sunshine.popularmovies.R;
  * Created by Abhishek on 14-05-2016.
  */
 public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener{
+
+    private static final String MOVIEFRAGMENT_TAG = "MF";
+    private static final String DETAILFRAGMENT_TAG = "DF";
+    private static final String FAVOURITEFRAGMENT_TAG = "FF";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +47,14 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
                         .getDefaultSharedPreferences(preference.getContext())
                         .getString(preference.getKey(), ""));
     }
+
+
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public Intent getParentActivityIntent() {
+        return super.getParentActivityIntent().addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+    }
+
 
     @Override
     public boolean onPreferenceChange(Preference preference, Object value) {

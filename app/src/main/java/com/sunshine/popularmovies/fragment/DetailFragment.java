@@ -139,12 +139,14 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private void updateTrailer() {
         FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext());
-        fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        if (mUri!=null)
+            fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     private void updateReview() {
         FetchReviewTask fetchReviewTask = new FetchReviewTask(getContext());
-        fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        if (mUri!=null)
+            fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     @Override
@@ -174,9 +176,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mUri = getActivity().getIntent().getData();
 
-        mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
+        Bundle args= getArguments();
+        if (args!=null)
+            mUri= args.getParcelable("DETAIL URI");
+        if (mUri!=null)
+            mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
 
@@ -261,9 +266,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        if (mUri == null )
-            return null;
-        else {
+
 
             if (id == LOADER_ID) {
 
@@ -289,7 +292,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         null);
             } else
                 return null;
-        }
 
 
     }

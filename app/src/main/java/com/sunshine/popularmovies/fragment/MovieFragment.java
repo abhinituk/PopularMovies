@@ -2,8 +2,8 @@ package com.sunshine.popularmovies.fragment;
 
 
 import android.annotation.TargetApi;
-import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -22,7 +22,6 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.sunshine.popularmovies.R;
-import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomMovieAdapter;
 import com.sunshine.popularmovies.data.MovieContract;
 import com.sunshine.popularmovies.network.FetchMovieTask;
@@ -32,6 +31,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
     private static RecyclerView mRecycledGridView;
+    private int mPosition = RecyclerView.NO_POSITION;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
@@ -40,6 +40,13 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             MovieContract.MovieEntry.COLUMN_FLAG,
             MovieContract.MovieEntry.COLUMN_FAVOURITE,
             MovieContract.MovieEntry.COLUMN_MOVIE_TITLE};
+
+    public interface Callback {
+        /**
+         * DetailFragmentCallback for when an item has been selected.
+         */
+        public void onItemSelected(Uri movieUri);
+    }
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.
     @Override
@@ -100,10 +107,12 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         mCustomMovieAdapter = new CustomMovieAdapter(getActivity(), new CustomMovieAdapter.CustomMovieAdapterOnClickHandler() {
             @Override
             public void onClick(int movieId, CustomMovieAdapter.ViewHolder vh) {
-                Intent intent = new Intent(getActivity(), DetailActivity.class)
-                        .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
+//                Intent intent = new Intent(getActivity(), DetailActivity.class)
+//                        .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
+                ( (Callback)getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
 
-                startActivity(intent);
+//                startActivity(intent);
+                mPosition= vh.getAdapterPosition();
             }
         });
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
