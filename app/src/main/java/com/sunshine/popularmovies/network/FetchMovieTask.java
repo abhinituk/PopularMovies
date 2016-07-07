@@ -10,6 +10,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 
 import com.sunshine.popularmovies.data.MovieContract;
+import com.sunshine.popularmovies.utility.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,7 +28,7 @@ import java.util.Vector;
 public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
     private final String LOG_TAG = FetchMovieTask.class.getSimpleName();
-    private Context mContext;
+    private final Context mContext;
 
     public FetchMovieTask(Activity activity) {
         mContext = activity;
@@ -108,7 +109,7 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
     }
 
 
-    private void getMovieDatafromJson(String movieJsonStr,String pref) throws JSONException {
+    private void getMovieDatafromJson(String movieJsonStr,String pref) {
 
         final String TMDB_POSTER_PATH = "poster_path";
         final String TMDB_OVERVIEW = "overview";
@@ -131,12 +132,13 @@ public class FetchMovieTask extends AsyncTask<String, Void, Void> {
 
                 for (int i = 0; i < array.length(); i++) {
                     JSONObject movieData = array.getJSONObject(i);
-                    String poster_path = BASE_URL + movieData.getString(TMDB_POSTER_PATH);
+                    String path = BASE_URL + movieData.getString(TMDB_POSTER_PATH);
                     String backdrop_path= BASE_BACKDROP_URL+movieData.getString(TMDB_BACKDROP_PATH);
                     int movieId = movieData.getInt(MOVIE_ID);
                     //String path= Utility.downloadImagesToIntenalStorage(mContext,poster_path,movieId)+"";
-                    //Log.v("Path",poster_path);
 
+                    String poster_path= Utility.storeImages(movieId,path);
+                    Log.v("Path",poster_path);
 
 
                     String overview = movieData.getString(TMDB_OVERVIEW);

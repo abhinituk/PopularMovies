@@ -16,9 +16,9 @@ import com.sunshine.popularmovies.data.MovieContract;
 
 public class CustomTrailerAdapter extends RecyclerView.Adapter<CustomTrailerAdapter.ViewHolder> {
 
-    Context mContext;
-    Cursor mCursor;
-    CustomTrailerAdapterOnClickHandler mCustomTrailerAdapterOnClickHandler;
+    private final Context mContext;
+    private Cursor mCursor;
+    private final CustomTrailerAdapterOnClickHandler mCustomTrailerAdapterOnClickHandler;
 
     public CustomTrailerAdapter(Context context,CustomTrailerAdapterOnClickHandler customTrailerAdapterOnClickHandler) {
         super();
@@ -41,8 +41,6 @@ public class CustomTrailerAdapter extends RecyclerView.Adapter<CustomTrailerAdap
 
         mCursor.moveToPosition(position);
         String thumbnailImage= mCursor.getString(mCursor.getColumnIndex(MovieContract.TrailerEntry.COL_TRAILER_THUMBNAIL));
-        String source= mCursor.getString(mCursor.getColumnIndex(MovieContract.TrailerEntry.COL_TRAILER_SOURCE));
-
 
         holder.playButton.setImageResource(R.drawable.ic_play_arrow);
         //Loading the thumbnail images
@@ -74,9 +72,9 @@ public class CustomTrailerAdapter extends RecyclerView.Adapter<CustomTrailerAdap
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        CardView cardView;
-        ImageView thumbnailImageView;
-        ImageView playButton;
+        final CardView cardView;
+        final ImageView thumbnailImageView;
+        final ImageView playButton;
 
 
         public ViewHolder(View itemView) {

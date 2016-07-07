@@ -11,21 +11,22 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 
+@SuppressWarnings("ConstantConditions")
 public class MovieProvider extends ContentProvider {
     private static final UriMatcher sUriMatcher = buildUriMatcher();
-    MovieDbHelper mMovieDbHelper;
+    private MovieDbHelper mMovieDbHelper;
 
     //Constants defined for Movie Table
-    static final int MOVIE = 100;
-    static final int MOVIE_WITH_MOVIE_ID = 101;
+    private static final int MOVIE = 100;
+    private static final int MOVIE_WITH_MOVIE_ID = 101;
 
     //Constants defined for Trailer Table
-    static final int TRAILER = 202;
-    static final int TRAILER_WITH_ID = 103;
+    private static final int TRAILER = 202;
+    private static final int TRAILER_WITH_ID = 103;
 
     //Constants defined for Review Table
-    static final int REVIEW = 104;
-    static final int REVIEW_WITH_ID = 105;
+    private static final int REVIEW = 104;
+    private static final int REVIEW_WITH_ID = 105;
 
 
     public MovieProvider() {
@@ -33,13 +34,13 @@ public class MovieProvider extends ContentProvider {
     }
 
     //movie.movie_id=?
-    final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
+    private final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
     //review.movie_id=?
-    final String reviewWithId = MovieContract.ReviewEntry.COL_REVIEW_ID + "=?";
+    private final String reviewWithId = MovieContract.ReviewEntry.COL_REVIEW_ID + "=?";
 
     //trailer.movie_id=?
-    final String trailerWithId = MovieContract.TrailerEntry.COL_TRAILER_ID + "=?";
+    private final String trailerWithId = MovieContract.TrailerEntry.COL_TRAILER_ID + "=?";
 
 
 
@@ -192,7 +193,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public Uri insert(Uri uri, ContentValues values) {
+    public Uri insert(@NonNull Uri uri, ContentValues values) {
 
         SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
@@ -268,7 +269,7 @@ public class MovieProvider extends ContentProvider {
 
         SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
-        long rowUpdated = 0;
+        long rowUpdated;
 
         switch (match) {
             case MOVIE:
@@ -294,7 +295,7 @@ public class MovieProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(@NonNull Uri uri, @NonNull ContentValues[] values) {
         SQLiteDatabase db = mMovieDbHelper.getWritableDatabase();
         final int match = sUriMatcher.match(uri);
         switch (match) {

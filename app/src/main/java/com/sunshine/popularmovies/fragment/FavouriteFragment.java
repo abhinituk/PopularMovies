@@ -20,8 +20,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.R;
+import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomMovieAdapter;
 import com.sunshine.popularmovies.data.MovieContract;
 
@@ -32,8 +32,8 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
 
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
-    static RecyclerView mRecycledGridView;
-    RecyclerView.LayoutManager mLayoutManager;
+    private static RecyclerView mRecycledGridView;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
             , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
@@ -41,31 +41,14 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
             MovieContract.MovieEntry.COLUMN_FLAG,
             MovieContract.MovieEntry.COLUMN_FAVOURITE,
             MovieContract.MovieEntry.COLUMN_MOVIE_TITLE};
-    static final int COL_ID = 0;
-    static final int COL_POSTER_PATH = 1;
-    static final int COL_MOVIE_ID = 2;
-    static final int COL_FLAG = 3;
-    static final int COL_FAVOURITE = 4;
-
-//    String oldSortPref, newSortPref;
 
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        if (savedInstanceState == null || !savedInstanceState.containsKey("Movie Data")) {
-//            mMovieDataArrayList = new ArrayList<>(Collections.singletonList(FetchMovieTask.mMovieData));
-//        } else {
-//            mMovieDataArrayList = savedInstanceState.getParcelableArrayList("Movie com.sunshine.popularmovies.data");
-//        }
-        setHasOptionsMenu(true);
-    }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-//        outState.putParcelableArrayList("Movie Data", mMovieDataArrayList);
-        super.onSaveInstanceState(outState);
+        setHasOptionsMenu(true);
     }
 
     @Override
@@ -99,7 +82,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
 
     }
 
-    public void movieDataUpdate() {
+    private void movieDataUpdate() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
 
     }
@@ -155,6 +138,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         if (data == null)
+            //noinspection ConstantConditions
             Snackbar.make(getView(),"No Favourite Movie",Snackbar.LENGTH_LONG).show();
         mCustomMovieAdapter.swapCursor(data);
     }

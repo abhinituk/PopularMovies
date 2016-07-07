@@ -18,8 +18,8 @@ import com.sunshine.popularmovies.data.MovieContract;
 public class CustomReviewAdapter extends RecyclerView.Adapter<CustomReviewAdapter.ViewHolder> {
     String noReview = "No Review Available";
 
-    Cursor mCursor;
-    Context mContext;
+    private Cursor mCursor;
+    private final Context mContext;
 
     public CustomReviewAdapter(Context context) {
         super();
@@ -50,9 +50,9 @@ public class CustomReviewAdapter extends RecyclerView.Adapter<CustomReviewAdapte
 
     public class ViewHolder extends RecyclerView.ViewHolder {
 
-        CardView cardView;
-        TextView authorTextView;
-        TextView contentTextView;
+        final CardView cardView;
+        final TextView authorTextView;
+        final TextView contentTextView;
 
         public ViewHolder(View itemView) {
             super(itemView);

@@ -7,28 +7,58 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.facebook.stetho.Stetho;
 import com.sunshine.popularmovies.R;
+import com.sunshine.popularmovies.fragment.DetailFragment;
 import com.sunshine.popularmovies.fragment.FavouriteFragment;
 import com.sunshine.popularmovies.fragment.MovieFragment;
 
 public class MainActivity extends AppCompatActivity {
+    private boolean mTwoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        if(savedInstanceState == null) {
-            String pref= PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
-            if(!pref.equals("favourite"))
-                getSupportFragmentManager().beginTransaction().add(R.id.container,new MovieFragment()).commit();
-            else
-                getSupportFragmentManager().beginTransaction().add(R.id.container,new FavouriteFragment()).commit();
+        View view= findViewById(R.id.detail_container);
+        mTwoPane= view!=null && view.getVisibility()== View.VISIBLE;
+        Log.v("Two Pane", String.valueOf(mTwoPane));
+
+        if(mTwoPane)
+        {
+
+            if(savedInstanceState == null) {
+                String pref= PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
+
+                if(!pref.equals("favourite"))
+                    getSupportFragmentManager().beginTransaction().add(R.id.container,new MovieFragment()).commit();
+                else
+                    getSupportFragmentManager().beginTransaction().add(R.id.container,new FavouriteFragment()).commit();
+
+                getSupportFragmentManager().beginTransaction().add(R.id.detail_container,new DetailFragment()).commit();
 
 
+            }
         }
+        else
+        {
+
+            if(savedInstanceState == null) {
+                String pref= PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
+
+                if(!pref.equals("favourite"))
+                    getSupportFragmentManager().beginTransaction().add(R.id.container,new MovieFragment()).commit();
+                else
+                    getSupportFragmentManager().beginTransaction().add(R.id.container,new FavouriteFragment()).commit();
+
+
+            }
+        }
+
+
         Stetho.initializeWithDefaults(this);
     }
 

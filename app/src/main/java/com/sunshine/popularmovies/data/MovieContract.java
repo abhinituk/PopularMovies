@@ -14,7 +14,7 @@ public class MovieContract {
     public static final String CONTENT_AUTHORITY="com.sunshine.popularmovies";
 
     //Defining the Base Content Uri
-    public static Uri BASE_CONTENT_URI= Uri.parse("content://"+CONTENT_AUTHORITY);
+    private static final Uri BASE_CONTENT_URI= Uri.parse("content://"+CONTENT_AUTHORITY);
 
     //Defining path for table used in database
     public static final String PATH_MOVIE="movie";

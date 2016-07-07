@@ -21,18 +21,18 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.sunshine.popularmovies.activity.DetailActivity;
-import com.sunshine.popularmovies.network.FetchMovieTask;
 import com.sunshine.popularmovies.R;
+import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomMovieAdapter;
 import com.sunshine.popularmovies.data.MovieContract;
+import com.sunshine.popularmovies.network.FetchMovieTask;
 
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
-    static RecyclerView mRecycledGridView;
-    RecyclerView.LayoutManager mLayoutManager;
+    private static RecyclerView mRecycledGridView;
+    private RecyclerView.LayoutManager mLayoutManager;
 
     private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
             , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
@@ -46,11 +46,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-       super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -81,7 +76,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
-    public void movieDataUpdate() {
+    private void movieDataUpdate() {
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
         String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
         if (!pref.equals("favourite"))
@@ -128,9 +123,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
         //movie.flag=?
         final String movieWithFlag = MovieContract.MovieEntry.COLUMN_FLAG + "=?";
-
-        //movie.favourite
-        final String movieMarkedFavourite = MovieContract.MovieEntry.COLUMN_FAVOURITE + "=?";
 
         String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
 

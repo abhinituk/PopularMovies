@@ -5,7 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 
-public class MovieDbHelper extends SQLiteOpenHelper {
+class MovieDbHelper extends SQLiteOpenHelper {
 
     private static final int DATEBASE_VERSION = 15;
     public static final String DATABASE_NAME = "movie.db";
@@ -21,7 +21,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         final String CREATE_TABLE_MOVIE =
                 "CREATE TABLE " + MovieContract.MovieEntry.TABLE_NAME + " (" +
                         MovieContract.MovieEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        MovieContract.MovieEntry.COLUMN_MOVIE_ID + " STRING NOT NULL UNIQUE ON CONFLICT REPLACE, " +
+                        MovieContract.MovieEntry.COLUMN_MOVIE_ID + " TEXT NOT NULL UNIQUE ON CONFLICT REPLACE, " +
                         MovieContract.MovieEntry.COLUMN_MOVIE_TITLE + " TEXT NOT NULL, " +
                         MovieContract.MovieEntry.COLUMN_MOVIE_OVERVIEW + " TEXT NOT NULL, " +
                         MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH + " TEXT NOT NULL, " +
@@ -37,7 +37,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         final String CREATE_TABLE_TRAILER=
                 "CREATE TABLE "+ MovieContract.TrailerEntry.TABLE_NAME+" ("+
                         MovieContract.TrailerEntry._ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                        MovieContract.TrailerEntry.COL_TRAILER_ID+" STRING NOT NULL, "+
+                        MovieContract.TrailerEntry.COL_TRAILER_ID+" TEXT NOT NULL, "+
                         MovieContract.TrailerEntry.COL_TRAILER_NAME+" TEXT NOT NULL, "+
                         MovieContract.TrailerEntry.COL_TRAILER_SOURCE+" TEXT NOT NULL, "+
                         MovieContract.TrailerEntry.COL_TRAILER_THUMBNAIL+" TEXT NOT NULL, "+
@@ -47,7 +47,7 @@ public class MovieDbHelper extends SQLiteOpenHelper {
         final String CREATE_TABLE_REVIEW=
                 "CREATE TABLE "+ MovieContract.ReviewEntry.TABLE_NAME+" ("+
                         MovieContract.ReviewEntry._ID+" INTEGER PRIMARY KEY AUTOINCREMENT, "+
-                        MovieContract.ReviewEntry.COL_REVIEW_ID+" STRING NOT NULL, "+
+                        MovieContract.ReviewEntry.COL_REVIEW_ID+" TEXT NOT NULL, "+
                         MovieContract.ReviewEntry.COL_REVIEW_AUTHOR+" TEXT NOT NULL, "+
                         MovieContract.ReviewEntry.COL_REVIEW_CONTENT+" TEXT NOT NULL, "+
                         "UNIQUE ("+ MovieContract.ReviewEntry.COL_REVIEW_ID+","+

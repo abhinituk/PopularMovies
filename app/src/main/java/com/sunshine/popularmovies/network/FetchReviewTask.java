@@ -29,7 +29,7 @@ import java.util.Vector;
 //This class is used to fetch review by making a request to  /movie/{id}/reviews endpoint.
 public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>> {
 
-    Context mContext;
+    private final Context mContext;
     public FetchReviewTask(Context context) {
        this.mContext=context;
     }
@@ -105,7 +105,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
 
 
     //This method is used to get appropriate review data from Json string received.
-    public void getReviewDataFromJson(String jsonString, int movieId) throws JSONException {
+    private void getReviewDataFromJson(String jsonString, int movieId) throws JSONException {
 
         //Field available in JSON strings
         final String TMDB_REVIEW_RESULT="results";
@@ -144,8 +144,6 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
             {
                 ContentValues contentValues[]= new ContentValues[valuesVector.size()];
                 valuesVector.toArray(contentValues);
-                int returnCount=mContext.getContentResolver().bulkInsert(MovieContract.ReviewEntry.CONTENT_URI,contentValues);
-                //Log.v("Return Count", String.valueOf(returnCount));
             }
 
 

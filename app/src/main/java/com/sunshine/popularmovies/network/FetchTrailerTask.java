@@ -28,7 +28,7 @@ import java.util.Vector;
 
 //This class is used to fetch trailer by making a request to  /movie/{id}/videos endpoint.
 public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>> {
-    Context mContext;
+    private final Context mContext;
 
     public FetchTrailerTask(Context context) {
         this.mContext = context;
@@ -92,7 +92,7 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
         return null;
     }
 
-    public void getTrailerDataFromJson(String jsonString, int movieId) throws JSONException {
+    private void getTrailerDataFromJson(String jsonString, int movieId) throws JSONException {
         final String TMDB_TRAILER_RESULTS = "results";
         final String TMDB_TRAILER_KEY = "key";
         final String TMDB_TRAILER_NAME = "name";
@@ -125,8 +125,6 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
             if (valuesVector.size() > 0) {
                 ContentValues contentValues[] = new ContentValues[valuesVector.size()];
                 valuesVector.toArray(contentValues);
-                int returnCount = mContext.getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI, contentValues);
-                //Log.v("Return Count", String.valueOf(returnCount));
             }
 
             Cursor cursor = mContext.getContentResolver().query(MovieContract.TrailerEntry.CONTENT_URI,

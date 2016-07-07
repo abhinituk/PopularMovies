@@ -20,6 +20,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-condensed"
+            android:text="Author"
 
             android:textStyle="bold"/>
         <TextView
@@ -27,7 +28,8 @@
             android:layout_height="wrap_content"
             android:id="@+id/list_item_review_content_textView"
             android:fontFamily="sans-serif"
-            android:textStyle="normal"/>
+            android:textStyle="normal"
+            android:text="Trailer"/>
     </LinearLayout>
 
 

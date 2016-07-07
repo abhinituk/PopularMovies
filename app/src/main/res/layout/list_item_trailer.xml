@@ -23,13 +23,15 @@
             android:layout_height="wrap_content"
             android:scaleType="fitCenter"
             android:id="@+id/list_item_thumbnail_imageView"
-            tools:ignore="ContentDescription" />
+            tools:ignore="ContentDescription"
+            android:src="@drawable/ic_favorite"/>
         <ImageView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
             android:layout_centerHorizontal="true"
             android:id="@+id/playTrailerButtonImageView"
+            android:src="@drawable/ic_play_arrow"
             />
 
 

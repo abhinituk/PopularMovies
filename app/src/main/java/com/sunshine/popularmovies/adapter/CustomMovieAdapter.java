@@ -14,6 +14,8 @@ import com.squareup.picasso.Picasso;
 import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.data.MovieContract;
 
+import java.io.File;
+
 public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.ViewHolder> {
 
     private Cursor mCursor;
@@ -46,8 +48,8 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        CardView cardView;
-        TextView titleTextView;
+        final CardView cardView;
+        final TextView titleTextView;
         final ImageView poster;
 
         ViewHolder(View view) {
@@ -86,7 +88,7 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
         String path = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
         String title=mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE));
         Picasso.with(mContext)
-                .load(path)
+                .load(new File(path))
                 .placeholder(R.drawable.placeholder)
                 .error(R.drawable.placeholder_error)
                 .into(holder.poster);

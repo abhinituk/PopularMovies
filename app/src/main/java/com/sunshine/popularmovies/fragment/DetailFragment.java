@@ -30,12 +30,14 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
-import com.sunshine.popularmovies.network.FetchReviewTask;
-import com.sunshine.popularmovies.network.FetchTrailerTask;
 import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.adapter.CustomReviewAdapter;
 import com.sunshine.popularmovies.adapter.CustomTrailerAdapter;
 import com.sunshine.popularmovies.data.MovieContract;
+import com.sunshine.popularmovies.network.FetchReviewTask;
+import com.sunshine.popularmovies.network.FetchTrailerTask;
+
+import java.io.File;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -45,16 +47,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
     //CustomReviewAdapter
-    CustomReviewAdapter mCustomReviewAdapter;
-    RecyclerView mRecyclerViewReview;
-    RecyclerView.LayoutManager mLayoutManagerReview;
+    private CustomReviewAdapter mCustomReviewAdapter;
+    private RecyclerView mRecyclerViewReview;
+    private RecyclerView.LayoutManager mLayoutManagerReview;
 
     //CustomTrailerAdapter
-    CustomTrailerAdapter mCustomTrailerAdapter;
-    RecyclerView mRecyclerViewTrailer;
-    RecyclerView.LayoutManager mLayoutManagerTrailer;
+    private CustomTrailerAdapter mCustomTrailerAdapter;
+    private RecyclerView mRecyclerViewTrailer;
+    private RecyclerView.LayoutManager mLayoutManagerTrailer;
 
-    private static String[] DETAIL_COLUMN = {
+    private static final String[] DETAIL_COLUMN = {
             MovieContract.MovieEntry._ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH,
@@ -69,17 +71,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     private static int COL_ID = 0;
     private static int COL_MOVIE_ID = 1;
-    private static int COL_POSTER_PATH = 2;
-    private static int COL_OVERVIEW = 3;
-    private static int COL_POPULARITY = 4;
-    private static int COL_RELEASE_DATE = 5;
-    private static int COL_MOVIE_TITLE = 6;
-    private static int COL_VOTE_AVG = 7;
-    private static int COL_VOTE_COUNT = 8;
-    private static int COL_FAVOURITE = 9;
-    private static int COL_BACKDROP_PATH = 10;
+    private static final int COL_POSTER_PATH = 2;
+    private static final int COL_OVERVIEW = 3;
+    private static final int COL_POPULARITY = 4;
+    private static final int COL_RELEASE_DATE = 5;
+    private static final int COL_MOVIE_TITLE = 6;
+    private static final int COL_VOTE_AVG = 7;
+    private static final int COL_VOTE_COUNT = 8;
+    private static final int COL_FAVOURITE = 9;
+    private static final int COL_BACKDROP_PATH = 10;
 
-    private static String[] REVIEW_COLUMN = {
+    private static final String[] REVIEW_COLUMN = {
             MovieContract.ReviewEntry._ID,
             MovieContract.ReviewEntry.COL_REVIEW_ID,
             MovieContract.ReviewEntry.COL_REVIEW_AUTHOR,
@@ -91,7 +93,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     private static int COL_REVIEW_AUTHOR = 2;
     private static int COL_REVIEW_CONTENT = 3;
 
-    private static String[] TRAILER_COLUMN = {
+    private static final String[] TRAILER_COLUMN = {
             MovieContract.TrailerEntry._ID,
             MovieContract.TrailerEntry.COL_TRAILER_ID,
             MovieContract.TrailerEntry.COL_TRAILER_NAME,
@@ -100,15 +102,16 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     };
 
 
-    Uri mUri;
+    private Uri mUri;
     private ShareActionProvider mShareActionProvider;
-    int mMovieId, favourite;
-    String shareIntentText;
+    private int mMovieId;
+    private int favourite;
+    private String shareIntentText;
 
-    FloatingActionButton fabFavourite;
+    private FloatingActionButton fabFavourite;
 
     //movie.movie_id=?
-    final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
+    private final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -134,12 +137,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     }
 
 
-    public void updateTrailer() {
+    private void updateTrailer() {
         FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext());
         fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
-    public void updateReview() {
+    private void updateReview() {
         FetchReviewTask fetchReviewTask = new FetchReviewTask(getContext());
         fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
@@ -176,9 +179,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
+
         //Implementing the Collapsing toolbar layout
         final Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        //noinspection ConstantConditions
         ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
 
@@ -256,30 +261,35 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
-        if (id == LOADER_ID) {
-
-            return new CursorLoader(getActivity(),
-                    mUri,
-                    DETAIL_COLUMN,
-                    null,
-                    null,
-                    null);
-        } else if (id == REVIEW_LOADER_ID) {
-            return new CursorLoader(getActivity(),
-                    MovieContract.ReviewEntry.buildReviewrWithId(mMovieId),
-                    REVIEW_COLUMN,
-                    null,
-                    null,
-                    null);
-        } else if (id == TRAILER_LOADER_ID) {
-            return new CursorLoader(getActivity(),
-                    MovieContract.TrailerEntry.buildTrailerWithId(mMovieId),
-                    TRAILER_COLUMN,
-                    null,
-                    null,
-                    null);
-        } else
+        if (mUri == null )
             return null;
+        else {
+
+            if (id == LOADER_ID) {
+
+                return new CursorLoader(getActivity(),
+                        mUri,
+                        DETAIL_COLUMN,
+                        null,
+                        null,
+                        null);
+            } else if (id == REVIEW_LOADER_ID) {
+                return new CursorLoader(getActivity(),
+                        MovieContract.ReviewEntry.buildReviewrWithId(mMovieId),
+                        REVIEW_COLUMN,
+                        null,
+                        null,
+                        null);
+            } else if (id == TRAILER_LOADER_ID) {
+                return new CursorLoader(getActivity(),
+                        MovieContract.TrailerEntry.buildTrailerWithId(mMovieId),
+                        TRAILER_COLUMN,
+                        null,
+                        null,
+                        null);
+            } else
+                return null;
+        }
 
 
     }
@@ -329,18 +339,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .into(mBackdrop);
 
 
-                Picasso.with(getContext()).load(poster_path)
+                Picasso.with(getContext())
+                        .load(new File(poster_path))
                         .error(R.drawable.placeholder_error)
                         .placeholder(R.drawable.placeholder)
                         .into(poster);
-
-                releaseDate.setText("Release Date: " + release_date);
-                voteAvg.setText("Vote Average: " + vote_average);
-                voteCount.setText("Vote Count: " + vote_count);
-                popularityText.setText("Popularity: " + popularity);
-
                 String overviewTitle = "Overview: " + "\n" + overview;
+                String releaseDateText="Release Date: " + release_date;
+                String voteAvgText="Vote Average: " + vote_average;
+                String voteCountText="Vote Count: " + vote_count;
+                String popularityTextContent="Popularity: " + popularity;
 
+                releaseDate.setText(releaseDateText);
+                voteAvg.setText(voteAvgText);
+                voteCount.setText(voteCountText);
+                popularityText.setText(popularityTextContent);
                 overView.setText(overviewTitle);
 
 
