@@ -20,6 +20,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,6 +32,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 import com.sunshine.popularmovies.R;
+import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomReviewAdapter;
 import com.sunshine.popularmovies.adapter.CustomTrailerAdapter;
 import com.sunshine.popularmovies.data.MovieContract;
@@ -132,21 +134,23 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Override
     public void onStart() {
         super.onStart();
-        updateTrailer();
-        updateReview();
+        Log.v("On Start ","Detail Fragment");
+//        updateTrailer();
+//        updateReview();
     }
+
 
 
     private void updateTrailer() {
-        FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getContext());
-        if (mUri!=null)
-            fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        Log.v("Detail Activity", String.valueOf(getContext() instanceof DetailActivity));
+        FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getActivity());
+        fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     private void updateReview() {
-        FetchReviewTask fetchReviewTask = new FetchReviewTask(getContext());
-        if (mUri!=null)
-            fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        Log.v("Detail Activity", String.valueOf(getContext() instanceof DetailActivity));
+        FetchReviewTask fetchReviewTask = new FetchReviewTask(getActivity());
+        fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     @Override
@@ -178,8 +182,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         Bundle args= getArguments();
-        if (args!=null)
-            mUri= args.getParcelable("DETAIL URI");
+        if (args!=null) {
+            mUri = args.getParcelable("DETAIL URI");
+            Log.v("Uri Received", String.valueOf(mUri));
+        }
         if (mUri!=null)
             mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
@@ -187,9 +193,12 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
         //Implementing the Collapsing toolbar layout
         final Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-        //noinspection ConstantConditions
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Log.v("Instance Detail", String.valueOf(( getActivity()) instanceof DetailActivity));
+        if(( getActivity()) instanceof DetailActivity) {
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            //noinspection ConstantConditions
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        }
 
 
         //CustomTrailerAdapter
@@ -379,6 +388,4 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public void onLoaderReset(Loader<Cursor> loader) {
 
     }
-
-
 }

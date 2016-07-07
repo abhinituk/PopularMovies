@@ -48,7 +48,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         /**
          * DetailFragmentCallback for when an item has been selected.
          */
-        public void onItemSelected(Uri dateUri);
+        public void onItemSelected(Uri movieUri);
     }
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.

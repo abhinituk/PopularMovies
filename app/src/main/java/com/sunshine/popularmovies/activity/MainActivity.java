@@ -74,6 +74,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment()).commit();
         else
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment()).commit();
+        getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
 
     }
 
@@ -119,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
         {
             Bundle args= new Bundle();
             args.putParcelable("DETAIL URI",movieUri);
+            Log.v("Uri Sent", String.valueOf(movieUri));
 
             DetailFragment detailFragment= new DetailFragment();
             detailFragment.setArguments(args);

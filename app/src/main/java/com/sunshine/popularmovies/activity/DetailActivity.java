@@ -1,7 +1,6 @@
 package com.sunshine.popularmovies.activity;
 
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -13,11 +12,6 @@ import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.fragment.DetailFragment;
 
 public class DetailActivity extends AppCompatActivity  {
-
-
-
-    Uri mUri;
-    int movieId;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -26,6 +20,8 @@ public class DetailActivity extends AppCompatActivity  {
 
             Bundle args = new Bundle();
             args.putParcelable("DETAIL URI",getIntent().getData());
+
+            Log.v("Uri received", String.valueOf(getIntent().getData()));
 
             DetailFragment detailFragment= new DetailFragment();
             detailFragment.setArguments(args);
