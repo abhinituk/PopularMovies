@@ -17,6 +17,7 @@ import com.sunshine.popularmovies.fragment.FavouriteFragment;
 import com.sunshine.popularmovies.fragment.MovieFragment;
 
 public class MainActivity extends AppCompatActivity implements MovieFragment.Callback,FavouriteFragment.Callback{
+
     private boolean mTwoPane;
 
     private static final String MOVIEFRAGMENT_TAG = "MF";
