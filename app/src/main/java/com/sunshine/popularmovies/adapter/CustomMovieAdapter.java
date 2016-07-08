@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +19,7 @@ import java.io.File;
 
 public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.ViewHolder> {
 
+    private final String LOG_TAG=getClass().getSimpleName();
     private Cursor mCursor;
     final private Context mContext;
     final private CustomMovieAdapterOnClickHandler mCustomMovieAdapterOnClickHandler;
@@ -84,6 +86,8 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
+        Log.v(LOG_TAG,"ON BindViewHolder");
+
         mCursor.moveToPosition(position);
         String path = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
         String title=mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE));
@@ -95,52 +99,4 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
 
         holder.titleTextView.setText(title);
     }
-
-
-//    @Override
-//    public void bindView(View view, Context context, Cursor cursor) {
-//        ViewHolder holder = (ViewHolder) view.getTag();
-//
-//        String posterPath = cursor.getString(MovieFragment.COL_POSTER_PATH);
-//        Target target = new Target() {
-//            @Override
-//            public void onBitmapLoaded(final Bitmap bitmap, Picasso.LoadedFrom from) {
-//                new Thread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        File directory = new File(Environment.getExternalStorageDirectory() + "/Images");
-//                        if (!directory.exists()) {
-//                            directory.mkdir();
-//                        }
-//                        try {
-//                            directory.createNewFile();
-//                            FileOutputStream outputStream = new FileOutputStream(directory);
-//                            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-//                            outputStream.close();
-//                        } catch (IOException e) {
-//                            e.printStackTrace();
-//                        }
-//
-//                    }
-//                }).start();
-//
-//            }
-//
-//            @Override
-//            public void onBitmapFailed(Drawable errorDrawable) {
-//
-//            }
-//
-//            @Override
-//            public void onPrepareLoad(Drawable placeHolderDrawable) {
-//
-//            }
-//        };
-
-
-//
-//
-//    }
-
-
 }

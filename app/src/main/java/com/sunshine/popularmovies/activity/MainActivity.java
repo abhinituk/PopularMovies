@@ -18,6 +18,7 @@ import com.sunshine.popularmovies.fragment.MovieFragment;
 
 public class MainActivity extends AppCompatActivity implements MovieFragment.Callback,FavouriteFragment.Callback{
 
+    private final String LOG_TAG= getClass().getSimpleName();
     private boolean mTwoPane;
 
     private static final String MOVIEFRAGMENT_TAG = "MF";
@@ -28,38 +29,38 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Log.v(LOG_TAG,"On Create Called");
 
         View view = findViewById(R.id.detail_container);
         mTwoPane = view != null && view.getVisibility() == View.VISIBLE;
-        Log.v("Two Pane", String.valueOf(mTwoPane));
+        Log.v(LOG_TAG, String.valueOf(mTwoPane));
 
-        if (mTwoPane) {
-
-            if (savedInstanceState == null) {
-                String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
-
-                if (!pref.equals("favourite"))
-                    getSupportFragmentManager().beginTransaction().add(R.id.container, new MovieFragment(), MOVIEFRAGMENT_TAG).commit();
-                else
-                    getSupportFragmentManager().beginTransaction().add(R.id.container, new FavouriteFragment(), FAVOURITEFRAGMENT_TAG).commit();
-
-                getSupportFragmentManager().beginTransaction().add(R.id.detail_container, new DetailFragment(), DETAILFRAGMENT_TAG).commit();
-
-
-            }
-        } else {
+//        if (mTwoPane) {
 
             if (savedInstanceState == null) {
                 String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
                 if (!pref.equals("favourite"))
-                    getSupportFragmentManager().beginTransaction().add(R.id.container, new MovieFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment(),MOVIEFRAGMENT_TAG).commit();
                 else
-                    getSupportFragmentManager().beginTransaction().add(R.id.container, new FavouriteFragment()).commit();
+                    getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment(),FAVOURITEFRAGMENT_TAG).commit();
+
 
 
             }
-        }
+//        } else {
+//
+//            if (savedInstanceState == null) {
+//                String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
+//
+//                if (!pref.equals("favourite"))
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment(),MOVIEFRAGMENT_TAG).commit();
+//                else
+//                    getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment(),FAVOURITEFRAGMENT_TAG).commit();
+//
+//
+//            }
+//        }
 
 
         Stetho.initializeWithDefaults(this);
@@ -69,34 +70,35 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
     @Override
     protected void onStart() {
         super.onStart();
+        Log.v(LOG_TAG,"OnStart Called");
         String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
         if (!pref.equals("favourite"))
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment()).commit();
         else
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment()).commit();
-        getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
+//        getSupportFragmentManager().beginTransaction().replace(R.id.detail_container,new DetailFragment()).commit();
 
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        Log.v("Main Activity", "onResume Called");
+        Log.v(LOG_TAG, "onResume Called");
         String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
         if (!pref.equals("favourite"))
-            getSupportFragmentManager().beginTransaction().replace(R.id.container,new MovieFragment()).commit();
-        else
-            getSupportFragmentManager().beginTransaction().replace(R.id.container,new FavouriteFragment()).commit();
+            getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
 
+        else
+            getSupportFragmentManager().findFragmentByTag(FAVOURITEFRAGMENT_TAG);
         getSupportFragmentManager().findFragmentByTag(DETAILFRAGMENT_TAG);
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        Log.v("Main Activity", "On Pause Called");
+        Log.v(LOG_TAG, "On Pause Called");
     }
 
     @Override
@@ -120,8 +122,8 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
         if (mTwoPane)
         {
             Bundle args= new Bundle();
-            args.putParcelable("DETAIL URI",movieUri);
-            Log.v("Uri Sent", String.valueOf(movieUri));
+            args.putParcelable("DETAIL",movieUri);
+            Log.v(LOG_TAG, String.valueOf(movieUri));
 
             DetailFragment detailFragment= new DetailFragment();
             detailFragment.setArguments(args);
@@ -130,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
         }
         else
         {
+            Log.v(LOG_TAG, String.valueOf(movieUri));
             Intent intent = new Intent(this, DetailActivity.class)
                         .setData(movieUri);
             startActivity(intent);

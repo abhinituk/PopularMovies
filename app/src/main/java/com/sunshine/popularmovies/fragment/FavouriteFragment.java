@@ -30,6 +30,7 @@ import com.sunshine.popularmovies.data.MovieContract;
  */
 public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private final String LOG_TAG= getClass().getSimpleName();
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
     private static RecyclerView mRecycledGridView;
@@ -100,8 +101,8 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v(LOG_TAG,"On CreateView Called");
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        //gridView = (GridView) rootView.findViewById(R.id.grid_view_fragment);
 
         mRecycledGridView = (RecyclerView) rootView.findViewById(R.id.recycled_grid_view);
         mRecycledGridView.setHasFixedSize(true);
@@ -112,13 +113,8 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         mCustomMovieAdapter = new CustomMovieAdapter(getActivity(), new CustomMovieAdapter.CustomMovieAdapterOnClickHandler() {
             @Override
             public void onClick(int movieId, CustomMovieAdapter.ViewHolder vh) {
-//                Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                        .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
-//
-//                startActivity(intent);
                 Log.v("Uri", String.valueOf(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId)));
                 ((Callback) getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
-                mPosition= vh.getAdapterPosition();
             }
 
         });

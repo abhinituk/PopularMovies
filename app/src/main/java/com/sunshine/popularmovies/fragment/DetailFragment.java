@@ -43,6 +43,8 @@ import java.io.File;
 
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private final String LOG_TAG = getClass().getSimpleName();
+
     private final int LOADER_ID = 100;
     private final int REVIEW_LOADER_ID = 200;
     private final int TRAILER_LOADER_ID = 300;
@@ -90,10 +92,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             MovieContract.ReviewEntry.COL_REVIEW_CONTENT
     };
 
-    private static int COL_REVIEW_ID = 0;
-    private static int COL_REVIEW_MOVIE_ID = 1;
-    private static int COL_REVIEW_AUTHOR = 2;
-    private static int COL_REVIEW_CONTENT = 3;
 
     private static final String[] TRAILER_COLUMN = {
             MovieContract.TrailerEntry._ID,
@@ -115,17 +113,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     //movie.movie_id=?
     private final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        getLoaderManager().initLoader(LOADER_ID, null, this);
-        getLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
-        getLoaderManager().initLoader(TRAILER_LOADER_ID, null, this);
-        super.onActivityCreated(savedInstanceState);
-
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "On Create Called");
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
@@ -133,24 +124,35 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onStart() {
+        Log.v("On Start ", "Detail Fragment");
         super.onStart();
-        Log.v("On Start ","Detail Fragment");
-//        updateTrailer();
-//        updateReview();
+        updateTrailer();
+        updateReview();
     }
 
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "On Activity Created");
+        getLoaderManager().initLoader(LOADER_ID, null, this);
+        getLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
+        getLoaderManager().initLoader(TRAILER_LOADER_ID, null, this);
+        super.onActivityCreated(savedInstanceState);
+
+    }
 
 
     private void updateTrailer() {
-        Log.v("Detail Activity", String.valueOf(getContext() instanceof DetailActivity));
+        Log.v(LOG_TAG, String.valueOf(getContext() instanceof DetailActivity));
         FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getActivity());
-        fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        if (mUri != null)
+            fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     private void updateReview() {
-        Log.v("Detail Activity", String.valueOf(getContext() instanceof DetailActivity));
+        Log.v(LOG_TAG, String.valueOf(getContext() instanceof DetailActivity));
         FetchReviewTask fetchReviewTask = new FetchReviewTask(getActivity());
-        fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        if (mUri != null)
+            fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
     }
 
     @Override
@@ -180,21 +182,20 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-
-        Bundle args= getArguments();
-        if (args!=null) {
-            mUri = args.getParcelable("DETAIL URI");
-            Log.v("Uri Received", String.valueOf(mUri));
-        }
-        if (mUri!=null)
+        Log.v(LOG_TAG, "On CreateView");
+        Bundle bundle= getArguments();
+        if (bundle!=null)
+            mUri= bundle.getParcelable("DETAIL");
+        if (mUri != null)
             mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
+        Log.v("Uri Received", String.valueOf(mUri));
         View view = inflater.inflate(R.layout.fragment_detail, container, false);
 
 
         //Implementing the Collapsing toolbar layout
         final Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
-        Log.v("Instance Detail", String.valueOf(( getActivity()) instanceof DetailActivity));
-        if(( getActivity()) instanceof DetailActivity) {
+        Log.v(LOG_TAG, String.valueOf((getActivity()) instanceof DetailActivity));
+        if ((getActivity()) instanceof DetailActivity) {
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
             //noinspection ConstantConditions
             ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -276,31 +277,30 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
 
+        if (id == LOADER_ID) {
 
-            if (id == LOADER_ID) {
-
-                return new CursorLoader(getActivity(),
-                        mUri,
-                        DETAIL_COLUMN,
-                        null,
-                        null,
-                        null);
-            } else if (id == REVIEW_LOADER_ID) {
-                return new CursorLoader(getActivity(),
-                        MovieContract.ReviewEntry.buildReviewrWithId(mMovieId),
-                        REVIEW_COLUMN,
-                        null,
-                        null,
-                        null);
-            } else if (id == TRAILER_LOADER_ID) {
-                return new CursorLoader(getActivity(),
-                        MovieContract.TrailerEntry.buildTrailerWithId(mMovieId),
-                        TRAILER_COLUMN,
-                        null,
-                        null,
-                        null);
-            } else
-                return null;
+            return new CursorLoader(getActivity(),
+                    mUri,
+                    DETAIL_COLUMN,
+                    null,
+                    null,
+                    null);
+        } else if (id == REVIEW_LOADER_ID) {
+            return new CursorLoader(getActivity(),
+                    MovieContract.ReviewEntry.buildReviewrWithId(mMovieId),
+                    REVIEW_COLUMN,
+                    null,
+                    null,
+                    null);
+        } else if (id == TRAILER_LOADER_ID) {
+            return new CursorLoader(getActivity(),
+                    MovieContract.TrailerEntry.buildTrailerWithId(mMovieId),
+                    TRAILER_COLUMN,
+                    null,
+                    null,
+                    null);
+        } else
+            return null;
 
 
     }
@@ -356,10 +356,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .placeholder(R.drawable.placeholder)
                         .into(poster);
                 String overviewTitle = "Overview: " + "\n" + overview;
-                String releaseDateText="Release Date: " + release_date;
-                String voteAvgText="Vote Average: " + vote_average;
-                String voteCountText="Vote Count: " + vote_count;
-                String popularityTextContent="Popularity: " + popularity;
+                String releaseDateText = "Release Date: " + release_date;
+                String voteAvgText = "Vote Average: " + vote_average;
+                String voteCountText = "Vote Count: " + vote_count;
+                String popularityTextContent = "Popularity: " + popularity;
 
                 releaseDate.setText(releaseDateText);
                 voteAvg.setText(voteAvgText);

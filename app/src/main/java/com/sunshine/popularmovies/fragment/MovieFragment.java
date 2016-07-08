@@ -14,6 +14,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,10 +29,12 @@ import com.sunshine.popularmovies.network.FetchMovieTask;
 
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+
+    private final String LOG_TAG= getClass().getSimpleName();
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
     private static RecyclerView mRecycledGridView;
-    private int mPosition = RecyclerView.NO_POSITION;
+    private int mPosition= RecyclerView.NO_POSITION;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
@@ -71,19 +74,23 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
+
+
 
     @Override
     public void onResume() {
+        Log.v(LOG_TAG,"On Resume Called");
         super.onResume();
-
         getLoaderManager().restartLoader(LOADER_ID, null, this);
-
-
-
     }
 
 
     private void movieDataUpdate() {
+        Log.v(LOG_TAG,"Update Movie data");
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
         String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
         if (!pref.equals("favourite"))
@@ -95,29 +102,26 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        Log.v(LOG_TAG,"On CreateView Called");
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
         mRecycledGridView = (RecyclerView) rootView.findViewById(R.id.recycled_grid_view);
         mRecycledGridView.setHasFixedSize(true);
-
-
-
         mLayoutManager = new GridLayoutManager(getContext(),2);
         mRecycledGridView.setLayoutManager(mLayoutManager);
 
         mCustomMovieAdapter = new CustomMovieAdapter(getActivity(), new CustomMovieAdapter.CustomMovieAdapterOnClickHandler() {
             @Override
             public void onClick(int movieId, CustomMovieAdapter.ViewHolder vh) {
-//                Intent intent = new Intent(getActivity(), DetailActivity.class)
-//                        .setData(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
                 ( (Callback)getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
-
-//                startActivity(intent);
                 mPosition= vh.getAdapterPosition();
             }
+
         });
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
         return rootView;
     }
+
+
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
@@ -133,18 +137,21 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         final String movieWithFlag = MovieContract.MovieEntry.COLUMN_FLAG + "=?";
 
         String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
+        if (!pref.equals("favourite"))
 
             return new CursorLoader(getActivity(), MovieContract.MovieEntry.CONTENT_URI,
                     MOVIE_COLUMN,
                     movieWithFlag,
                     new String[]{pref},
                     null);
+        else return null;
     }
 
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCustomMovieAdapter.swapCursor(data);
+
     }
 
     @Override

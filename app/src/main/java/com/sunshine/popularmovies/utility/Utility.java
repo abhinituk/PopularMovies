@@ -14,6 +14,12 @@ import java.io.InputStream;
 import java.net.URL;
 
 public class Utility {
+
+    private static int COL_REVIEW_ID = 0;
+    private static int COL_REVIEW_MOVIE_ID = 1;
+    private static int COL_REVIEW_AUTHOR = 2;
+    private static int COL_REVIEW_CONTENT = 3;
+
     public static void setListViewHeightBasedOnChildren(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
