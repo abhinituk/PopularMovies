@@ -118,13 +118,11 @@ public class FetchTrailerTask extends AsyncTask<Integer, Void, ArrayList<String>
                 values.put(MovieContract.TrailerEntry.COL_TRAILER_THUMBNAIL,thumbnailImage);
 
                 valuesVector.add(values);
-
-
-                //mArrayListTrailer.add(trailerData);
             }
             if (valuesVector.size() > 0) {
                 ContentValues contentValues[] = new ContentValues[valuesVector.size()];
                 valuesVector.toArray(contentValues);
+                mContext.getContentResolver().bulkInsert(MovieContract.TrailerEntry.CONTENT_URI,contentValues);
             }
 
             Cursor cursor = mContext.getContentResolver().query(MovieContract.TrailerEntry.CONTENT_URI,

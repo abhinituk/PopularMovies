@@ -11,8 +11,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -21,7 +23,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bignerdranch.android.multiselector.MultiSelector;
+import com.bignerdranch.android.multiselector.SingleSelector;
 import com.sunshine.popularmovies.R;
+import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomMovieAdapter;
 import com.sunshine.popularmovies.data.MovieContract;
 
@@ -51,6 +56,9 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
          */
         public void onItemSelected(Uri movieUri);
     }
+
+    //Implementing choice mode for recycler views
+    MultiSelector mSingleSelector= new SingleSelector();
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.
     @Override
@@ -104,6 +112,11 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         Log.v(LOG_TAG,"On CreateView Called");
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
+        //Implementing the toolbar
+        final Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        Log.v(LOG_TAG, String.valueOf((getActivity()) instanceof DetailActivity));
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
         mRecycledGridView = (RecyclerView) rootView.findViewById(R.id.recycled_grid_view);
         mRecycledGridView.setHasFixedSize(true);
 
@@ -117,7 +130,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
                 ((Callback) getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
             }
 
-        });
+        },mSingleSelector);
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
         return rootView;
     }

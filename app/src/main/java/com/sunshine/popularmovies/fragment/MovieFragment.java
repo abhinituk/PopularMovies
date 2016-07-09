@@ -12,8 +12,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -22,7 +24,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.bignerdranch.android.multiselector.MultiSelector;
+import com.bignerdranch.android.multiselector.SingleSelector;
 import com.sunshine.popularmovies.R;
+import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomMovieAdapter;
 import com.sunshine.popularmovies.data.MovieContract;
 import com.sunshine.popularmovies.network.FetchMovieTask;
@@ -30,11 +35,11 @@ import com.sunshine.popularmovies.network.FetchMovieTask;
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final String LOG_TAG= getClass().getSimpleName();
+    private final String LOG_TAG = getClass().getSimpleName();
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
     private static RecyclerView mRecycledGridView;
-    private int mPosition= RecyclerView.NO_POSITION;
+    private int mPosition = RecyclerView.NO_POSITION;
     private RecyclerView.LayoutManager mLayoutManager;
 
     private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
@@ -50,6 +55,12 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
          */
         public void onItemSelected(Uri movieUri);
     }
+
+    /*
+    Implementing the MultiSelector for RecyclerViews
+     */
+    MultiSelector mSingleSelector= new SingleSelector();
+
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.
     @Override
@@ -80,17 +91,16 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
-
     @Override
     public void onResume() {
-        Log.v(LOG_TAG,"On Resume Called");
+        Log.v(LOG_TAG, "On Resume Called");
         super.onResume();
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
 
     private void movieDataUpdate() {
-        Log.v(LOG_TAG,"Update Movie data");
+        Log.v(LOG_TAG, "Update Movie data");
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
         String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
         if (!pref.equals("favourite"))
@@ -102,11 +112,19 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(LOG_TAG,"On CreateView Called");
+        Log.v(LOG_TAG, "On CreateView Called");
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+
+        //Implementing the toolbar
+        final Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        Log.v(LOG_TAG, String.valueOf((getActivity()) instanceof DetailActivity));
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+
+
+
         mRecycledGridView = (RecyclerView) rootView.findViewById(R.id.recycled_grid_view);
         mRecycledGridView.setHasFixedSize(true);
-        mLayoutManager = new GridLayoutManager(getContext(),2);
+        mLayoutManager = new GridLayoutManager(getContext(), 2);
         mRecycledGridView.setLayoutManager(mLayoutManager);
 
         mCustomMovieAdapter = new CustomMovieAdapter(getActivity(), new CustomMovieAdapter.CustomMovieAdapterOnClickHandler() {
@@ -116,11 +134,10 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 mPosition= vh.getAdapterPosition();
             }
 
-        });
+        },mSingleSelector);
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
         return rootView;
     }
-
 
 
     @Override

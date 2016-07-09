@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bignerdranch.android.multiselector.MultiSelector;
 import com.squareup.picasso.Picasso;
 import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.data.MovieContract;
@@ -19,10 +20,11 @@ import java.io.File;
 
 public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.ViewHolder> {
 
-    private final String LOG_TAG=getClass().getSimpleName();
+    private final String LOG_TAG = getClass().getSimpleName();
     private Cursor mCursor;
     final private Context mContext;
     final private CustomMovieAdapterOnClickHandler mCustomMovieAdapterOnClickHandler;
+    private MultiSelector mSingleSelector;
 
 
     @Override
@@ -34,9 +36,10 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     }
 
 
-    public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch) {
+    public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch, MultiSelector mSingleSelector) {
         this.mContext = context;
         this.mCustomMovieAdapterOnClickHandler = ch;
+        this.mSingleSelector = mSingleSelector;
     }
 
 
@@ -50,26 +53,31 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        final View mView;
         final CardView cardView;
         final TextView titleTextView;
         final ImageView poster;
 
         ViewHolder(View view) {
             super(view);
-            cardView= (CardView) view.findViewById(R.id.grid_item_cardView);
+            mView = view;
+
+            cardView = (CardView) view.findViewById(R.id.grid_item_cardView);
             poster = (ImageView) view.findViewById(R.id.grid_item_imageview);
-            titleTextView= (TextView) view.findViewById(R.id.grid_item_title_textView);
+            titleTextView = (TextView) view.findViewById(R.id.grid_item_title_textView);
 
             view.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
+            Log.v(LOG_TAG, "On Click Called");
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
             int movieId = mCursor.getInt(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
             mCustomMovieAdapterOnClickHandler.onClick(movieId, this);
-
+            mSingleSelector.setSelectable(true);
+            mView.setBackgroundColor(mContext.getResources().getColor(R.color.gridSelectedColor));
         }
     }
 

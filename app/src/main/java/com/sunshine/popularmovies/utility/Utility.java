@@ -1,10 +1,6 @@
 package com.sunshine.popularmovies.utility;
 
 import android.os.Environment;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -20,27 +16,6 @@ public class Utility {
     private static int COL_REVIEW_AUTHOR = 2;
     private static int COL_REVIEW_CONTENT = 3;
 
-    public static void setListViewHeightBasedOnChildren(ListView listView) {
-        ListAdapter listAdapter = listView.getAdapter();
-        if (listAdapter == null) {
-            // pre-condition
-            return;
-        }
-
-        int totalHeight = listView.getPaddingTop() + listView.getPaddingBottom();
-        for (int i = 0; i < listAdapter.getCount(); i++) {
-            View listItem = listAdapter.getView(i, null, listView);
-            if (listItem instanceof ViewGroup) {
-                listItem.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-            }
-            listItem.measure(0, 0);
-            totalHeight += listItem.getMeasuredHeight();
-        }
-
-        ViewGroup.LayoutParams params = listView.getLayoutParams();
-        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
-        listView.setLayoutParams(params);
-    }
 
     public static String storeImages(int movieId,String posterPath) {
         try {
@@ -73,6 +48,9 @@ public class Utility {
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
+        }
+        finally {
+
         }
         return null;
     }

@@ -144,6 +144,7 @@ public class FetchReviewTask extends AsyncTask<Integer, Void, ArrayList<String>>
             {
                 ContentValues contentValues[]= new ContentValues[valuesVector.size()];
                 valuesVector.toArray(contentValues);
+                mContext.getContentResolver().bulkInsert(MovieContract.ReviewEntry.CONTENT_URI,contentValues);
             }
 
 

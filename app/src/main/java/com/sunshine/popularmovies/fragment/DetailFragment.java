@@ -1,6 +1,7 @@
 package com.sunshine.popularmovies.fragment;
 
 
+import android.content.AsyncQueryHandler;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
@@ -116,23 +117,22 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.v(LOG_TAG, "On Create Called");
         super.onCreate(savedInstanceState);
 
         setHasOptionsMenu(true);
     }
 
+
     @Override
     public void onStart() {
-        Log.v("On Start ", "Detail Fragment");
+        Log.v(LOG_TAG, "On Start Called");
         super.onStart();
-        updateTrailer();
         updateReview();
+        updateTrailer();
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        Log.v(LOG_TAG, "On Activity Created");
         getLoaderManager().initLoader(LOADER_ID, null, this);
         getLoaderManager().initLoader(REVIEW_LOADER_ID, null, this);
         getLoaderManager().initLoader(TRAILER_LOADER_ID, null, this);
@@ -142,23 +142,21 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
 
     private void updateTrailer() {
-        Log.v(LOG_TAG, String.valueOf(getContext() instanceof DetailActivity));
         FetchTrailerTask fetchTrailerTask = new FetchTrailerTask(getActivity());
-        if (mUri != null)
-            fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        fetchTrailerTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        Log.v(LOG_TAG, String.valueOf(MovieContract.MovieEntry.getMovieId(mUri)));
     }
 
     private void updateReview() {
-        Log.v(LOG_TAG, String.valueOf(getContext() instanceof DetailActivity));
         FetchReviewTask fetchReviewTask = new FetchReviewTask(getActivity());
-        if (mUri != null)
-            fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        fetchReviewTask.execute(MovieContract.MovieEntry.getMovieId(mUri));
+        Log.v(LOG_TAG, String.valueOf(MovieContract.MovieEntry.getMovieId(mUri)));
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         inflater.inflate(R.menu.detailfragment, menu);
-//         Retrieve the share menu item
+        //Retrieve the share menu item
         MenuItem menuItem = menu.findItem(R.id.action_share);
 
         // Get the provider and hold onto it to set/change the share intent.
@@ -181,11 +179,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(final LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         Log.v(LOG_TAG, "On CreateView");
-        Bundle bundle= getArguments();
-        if (bundle!=null)
-            mUri= bundle.getParcelable("DETAIL");
+        Bundle bundle = getArguments();
+        if (bundle != null)
+            mUri = bundle.getParcelable("DETAIL");
         if (mUri != null)
             mMovieId = MovieContract.MovieEntry.getMovieId(mUri);
         Log.v("Uri Received", String.valueOf(mUri));
@@ -202,6 +200,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         }
 
 
+
+
         //CustomTrailerAdapter
         mRecyclerViewTrailer = (RecyclerView) view.findViewById(R.id.recycled_trailer_list_view);
         mRecyclerViewTrailer.setHasFixedSize(true);
@@ -213,7 +213,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             @Override
             public void onClick(String videoSource, CustomTrailerAdapter.ViewHolder vh) {
                 Intent intent = new Intent(Intent.ACTION_VIEW).setData(Uri.parse(videoSource));
-                startActivity(intent);
+
+                if ((intent.resolveActivity(getContext().getPackageManager())) != null) {
+                    startActivity(intent);
+                }
+
             }
         });
         mRecyclerViewTrailer.setAdapter(mCustomTrailerAdapter);
@@ -234,38 +238,51 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         fabFavourite.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Cursor cursor = getContext().getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+
+                final AsyncQueryHandler asyncQueryHandler = new AsyncQueryHandler(getContext().getContentResolver()) {
+                    @Override
+                    protected void onUpdateComplete(int token, Object cookie, int result) {
+                        super.onUpdateComplete(token, cookie, result);
+                    }
+                };
+
+                final AsyncQueryHandler queryHandler = new AsyncQueryHandler(getContext().getContentResolver()) {
+                    @Override
+                    protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
+                        if (cursor.moveToFirst()) {
+                            favourite = cursor.getInt(COL_FAVOURITE);
+                            if (favourite == 0) {
+                                ContentValues cv = new ContentValues();
+                                cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 1);
+                                asyncQueryHandler.startUpdate(1, null, MovieContract.MovieEntry.CONTENT_URI,
+                                        cv,
+                                        movieWithMovieId,
+                                        new String[]{String.valueOf(mMovieId)});
+                                Snackbar.make(getView(), "Movie Added As Favourite", Snackbar.LENGTH_LONG).show();
+
+                            } else {
+                                ContentValues cv = new ContentValues();
+                                cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 0);
+                                asyncQueryHandler.startUpdate(1, null, MovieContract.MovieEntry.CONTENT_URI,
+                                        cv,
+                                        movieWithMovieId,
+                                        new String[]{String.valueOf(mMovieId)});
+                                Snackbar.make(getView(), "Movie Removed From Favorite", Snackbar.LENGTH_LONG).show();
+
+                            }
+                        }
+                    }
+                };
+
+
+                queryHandler.startQuery(
+                        1,
+                        null,
+                        MovieContract.MovieEntry.CONTENT_URI,
                         DETAIL_COLUMN,
                         movieWithMovieId,
-                        new String[]{String.valueOf(mMovieId)}, null);
-
-                assert cursor != null;
-                if (cursor.moveToFirst()) {
-                    favourite = cursor.getInt(COL_FAVOURITE);
-                }
-
-                if (favourite == 0) {
-                    ContentValues cv = new ContentValues();
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 1);
-                    getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
-                            cv,
-                            movieWithMovieId,
-                            new String[]{String.valueOf(mMovieId)});
-                    Snackbar.make(view, "Movie Added As Favourite", Snackbar.LENGTH_LONG).show();
-
-                } else {
-                    ContentValues cv = new ContentValues();
-                    cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 0);
-                    getContext().getContentResolver().update(MovieContract.MovieEntry.CONTENT_URI,
-                            cv,
-                            movieWithMovieId,
-                            new String[]{String.valueOf(mMovieId)});
-                    Snackbar.make(view, "Movie Removed From Favorite", Snackbar.LENGTH_LONG).show();
-
-                }
-
-                cursor.close();
-
+                        new String[]{String.valueOf(mMovieId)},
+                        null);
             }
         });
 

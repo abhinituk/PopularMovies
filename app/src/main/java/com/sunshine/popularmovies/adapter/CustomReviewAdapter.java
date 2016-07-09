@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,8 @@ import com.sunshine.popularmovies.data.MovieContract;
  * Created by Abhishek on 04-07-2016.
  */
 public class CustomReviewAdapter extends RecyclerView.Adapter<CustomReviewAdapter.ViewHolder> {
+    private final String LOG_TAG= getClass().getSimpleName();
+
     String noReview = "No Review Available";
 
     private Cursor mCursor;
@@ -35,6 +38,8 @@ public class CustomReviewAdapter extends RecyclerView.Adapter<CustomReviewAdapte
 
     @Override
     public void onBindViewHolder(CustomReviewAdapter.ViewHolder holder, int position) {
+        Log.v(LOG_TAG,"On BindViewHolder");
+
         mCursor.moveToPosition(position);
 
         String author = mCursor.getString(mCursor.getColumnIndex(MovieContract.ReviewEntry.COL_REVIEW_AUTHOR));
@@ -56,7 +61,6 @@ public class CustomReviewAdapter extends RecyclerView.Adapter<CustomReviewAdapte
 
         public ViewHolder(View itemView) {
             super(itemView);
-
             cardView = (CardView) itemView.findViewById(R.id.grid_item_review_cardView);
             authorTextView = (TextView) itemView.findViewById(R.id.list_item_review_author_textView);
             contentTextView = (TextView) itemView.findViewById(R.id.list_item_review_content_textView);
