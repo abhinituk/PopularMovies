@@ -13,6 +13,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.app.NavUtils;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
@@ -167,18 +168,18 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-//    @Override
-//    public boolean onOptionsItemSelected(MenuItem item) {
-////        int id=item.getItemId();
-////        /*
-////        http://stackoverflow.com/questions/16434445/using-actionbar-home-as-up-button-home-activity-saveinstancestate-is-always-nul
-////         */
-////        if (id == android.R.id.home)
-////        {
-////            NavUtils.navigateUpFromSameTask(getActivity());
-////        }
-//        return super.onOptionsItemSelected(item);
-//    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id=item.getItemId();
+        /*
+        http://stackoverflow.com/questions/16434445/using-actionbar-home-as-up-button-home-activity-saveinstancestate-is-always-nul
+         */
+        if (id == android.R.id.home)
+        {
+            NavUtils.navigateUpFromSameTask(getActivity());
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     //Creating the ShareActionProvider
     private Intent createShareMovieIntent() {
