@@ -6,7 +6,6 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -23,8 +22,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bignerdranch.android.multiselector.MultiSelector;
-import com.bignerdranch.android.multiselector.SingleSelector;
 import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomMovieAdapter;
@@ -39,8 +36,9 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
     private static RecyclerView mRecycledGridView;
-    private int mPosition = RecyclerView.NO_POSITION;
     private RecyclerView.LayoutManager mLayoutManager;
+    private int mPosition;
+    private final String POSITION="position";
 
     private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
             , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
@@ -57,8 +55,6 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         public void onItemSelected(Uri movieUri);
     }
 
-    //Implementing choice mode for recycler views
-    MultiSelector mSingleSelector= new SingleSelector();
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.
     @Override
@@ -92,16 +88,15 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     }
 
 
-    @Override
-    public void onStart() {
-        super.onStart();
-        movieDataUpdate();
-
-    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        movieDataUpdate();
+//
+//    }
 
     private void movieDataUpdate() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
-
     }
 
 
@@ -109,7 +104,10 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(LOG_TAG,"On CreateView Called");
+        if (savedInstanceState!=null && savedInstanceState.containsKey(POSITION))
+        {
+            mPosition= savedInstanceState.getInt(POSITION);
+        }
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         //Implementing the toolbar
@@ -128,11 +126,20 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
             public void onClick(int movieId, CustomMovieAdapter.ViewHolder vh) {
                 Log.v("Uri", String.valueOf(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId)));
                 ((Callback) getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
+                mPosition=vh.getLayoutPosition();
             }
 
-        },mSingleSelector);
+        },mPosition);
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
+
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(POSITION,mPosition);
+        Log.v(LOG_TAG,mPosition+"saved");
     }
 
     @Override
@@ -158,10 +165,9 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        if (data == null)
-            //noinspection ConstantConditions
-            Snackbar.make(getView(),"No Favourite Movie",Snackbar.LENGTH_LONG).show();
         mCustomMovieAdapter.swapCursor(data);
+        mRecycledGridView.getLayoutManager().scrollToPosition(mPosition);
+        mCustomMovieAdapter.notifyItemChanged(mPosition);
     }
 
     @Override

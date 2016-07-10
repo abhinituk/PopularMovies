@@ -24,8 +24,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.bignerdranch.android.multiselector.MultiSelector;
-import com.bignerdranch.android.multiselector.SingleSelector;
 import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomMovieAdapter;
@@ -39,8 +37,9 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
     private static RecyclerView mRecycledGridView;
-    private int mPosition = RecyclerView.NO_POSITION;
     private RecyclerView.LayoutManager mLayoutManager;
+    private int mPosition;
+    private final String POSITION="position";
 
     private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
             , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
@@ -56,10 +55,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         public void onItemSelected(Uri movieUri);
     }
 
-    /*
-    Implementing the MultiSelector for RecyclerViews
-     */
-    MultiSelector mSingleSelector= new SingleSelector();
+
 
 
     //onCreate is used to create the fragment. In this put components which has to be retained when fragment is paused or stopped & then resumed.
@@ -85,22 +81,17 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
+
 
 
     @Override
     public void onResume() {
-        Log.v(LOG_TAG, "On Resume Called");
         super.onResume();
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
 
     private void movieDataUpdate() {
-        Log.v(LOG_TAG, "Update Movie data");
         FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
         String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
         if (!pref.equals("favourite"))
@@ -111,8 +102,11 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     //In this fragment draws its UI for the first time
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Log.v(LOG_TAG, "On CreateView Called");
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable final Bundle savedInstanceState) {
+        if (savedInstanceState!=null && savedInstanceState.containsKey(POSITION))
+        {
+            mPosition= savedInstanceState.getInt(POSITION);
+        }
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         //Implementing the toolbar
@@ -131,12 +125,19 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             @Override
             public void onClick(int movieId, CustomMovieAdapter.ViewHolder vh) {
                 ( (Callback)getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
-                mPosition= vh.getAdapterPosition();
+                mPosition= vh.getLayoutPosition();
             }
 
-        },mSingleSelector);
+        },mPosition);
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
         return rootView;
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(POSITION,mPosition);
+        Log.v(LOG_TAG,mPosition+"saved");
     }
 
 
@@ -168,11 +169,13 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
         mCustomMovieAdapter.swapCursor(data);
-
+        mRecycledGridView.getLayoutManager().scrollToPosition(mPosition);
+        mCustomMovieAdapter.notifyItemChanged(mPosition);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mCustomMovieAdapter.swapCursor(null);
     }
+
 }

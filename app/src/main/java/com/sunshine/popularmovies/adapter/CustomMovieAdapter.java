@@ -2,16 +2,15 @@ package com.sunshine.popularmovies.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bignerdranch.android.multiselector.MultiSelector;
 import com.squareup.picasso.Picasso;
 import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.data.MovieContract;
@@ -24,8 +23,7 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     private Cursor mCursor;
     final private Context mContext;
     final private CustomMovieAdapterOnClickHandler mCustomMovieAdapterOnClickHandler;
-    private MultiSelector mSingleSelector;
-
+    private int mSelectedPosition;
 
     @Override
     public int getItemCount() {
@@ -36,12 +34,11 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     }
 
 
-    public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch, MultiSelector mSingleSelector) {
+    public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch,int position) {
         this.mContext = context;
         this.mCustomMovieAdapterOnClickHandler = ch;
-        this.mSingleSelector = mSingleSelector;
+        this.mSelectedPosition=position;
     }
-
 
     public void swapCursor(Cursor data) {
         mCursor = data;
@@ -71,13 +68,17 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
 
         @Override
         public void onClick(View v) {
-            Log.v(LOG_TAG, "On Click Called");
             int adapterPosition = getAdapterPosition();
             mCursor.moveToPosition(adapterPosition);
             int movieId = mCursor.getInt(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
             mCustomMovieAdapterOnClickHandler.onClick(movieId, this);
-            mSingleSelector.setSelectable(true);
-            mView.setBackgroundColor(mContext.getResources().getColor(R.color.gridSelectedColor));
+            // Update the selected state for the old position
+            notifyItemChanged(mSelectedPosition);
+
+            mSelectedPosition = getLayoutPosition();
+
+            // Updating the selected state for the new position
+            notifyItemChanged(mSelectedPosition);
         }
     }
 
@@ -94,8 +95,6 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        Log.v(LOG_TAG,"ON BindViewHolder");
-
         mCursor.moveToPosition(position);
         String path = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
         String title=mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE));
@@ -106,5 +105,11 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
                 .into(holder.poster);
 
         holder.titleTextView.setText(title);
+        if (mSelectedPosition == position) {
+            holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.gridSelectedColor));
+        }
+        else{
+            holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"));
+        }
     }
 }

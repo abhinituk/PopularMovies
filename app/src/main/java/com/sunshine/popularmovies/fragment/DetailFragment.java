@@ -167,6 +167,19 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         super.onCreateOptionsMenu(menu, inflater);
     }
 
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+////        int id=item.getItemId();
+////        /*
+////        http://stackoverflow.com/questions/16434445/using-actionbar-home-as-up-button-home-activity-saveinstancestate-is-always-nul
+////         */
+////        if (id == android.R.id.home)
+////        {
+////            NavUtils.navigateUpFromSameTask(getActivity());
+////        }
+//        return super.onOptionsItemSelected(item);
+//    }
+
     //Creating the ShareActionProvider
     private Intent createShareMovieIntent() {
         Intent shareIntent = new Intent(Intent.ACTION_SEND);
