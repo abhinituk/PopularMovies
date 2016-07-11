@@ -37,7 +37,7 @@ import java.util.Vector;
  */
 public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
     public final String LOG_TAG = MovieSyncAdapter.class.getSimpleName();
-    public static final int SYNC_INTERVAL = 10;
+    public static final int SYNC_INTERVAL = 60*180;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
 
     public MovieSyncAdapter(Context context, boolean autoInitialize) {

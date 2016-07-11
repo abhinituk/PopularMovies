@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
     private static final String MOVIEFRAGMENT_TAG = "MF";
     private static final String DETAILFRAGMENT_TAG = "DF";
     private static final String FAVOURITEFRAGMENT_TAG = "FF";
+    private boolean flag;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +42,12 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
             Log.v(LOG_TAG, "On Saved Instance Called");
             pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
-            if (!pref.equals("favourite"))
+            if (!pref.equals("favourite")) {
+                if (pref.equals("popular"))
+                    flag = true;
+                Log.v(LOG_TAG, String.valueOf(flag));
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment(), MOVIEFRAGMENT_TAG).commit();
-            else
+            } else
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment(), FAVOURITEFRAGMENT_TAG).commit();
         }
 
@@ -62,19 +66,18 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
         Log.v(LOG_TAG, "New Preference: " + newPref);
         Log.v(LOG_TAG, "Old Preference: " + pref);
         //This case is only applicable when user installs the app for the first time
-        if (pref.equals("popular") && newPref.equals("popular"))
-        {
-            MovieFragment mf= (MovieFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+        Log.v(LOG_TAG, String.valueOf(flag));
+        if (flag) {
+            MovieFragment mf = (MovieFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
             mf.preferenceChanged();
-
         }
+        flag=false;
         if (!pref.equals(newPref)) {
             Log.v(LOG_TAG, "Preference changed");
             if (!newPref.equals("favourite")) {
                 Log.v(LOG_TAG, "Preference not changed to fav");
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,new MovieFragment(),MOVIEFRAGMENT_TAG).commit();
-            }
-            else {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment(), MOVIEFRAGMENT_TAG).commit();
+            } else {
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment(), FAVOURITEFRAGMENT_TAG).commit();
                 Log.v(LOG_TAG, "Preference changed to fav");
             }
@@ -91,18 +94,18 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
 
     @Override
     protected void onResume() {
-        Log.v(LOG_TAG,"On Resume Called");
+        Log.v(LOG_TAG, "On Resume Called");
         super.onResume();
         newPref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
         if (!pref.equals(newPref)) {
             if (!newPref.equals("favourite")) {
-                MovieFragment mf= (MovieFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+                MovieFragment mf = (MovieFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, mf).commit();
                 mf.preferenceChanged();
             } else {
-                FavouriteFragment ff= (FavouriteFragment) getSupportFragmentManager().findFragmentByTag(FAVOURITEFRAGMENT_TAG);
-                getSupportFragmentManager().beginTransaction().replace(R.id.container,ff).commit();
+                FavouriteFragment ff = (FavouriteFragment) getSupportFragmentManager().findFragmentByTag(FAVOURITEFRAGMENT_TAG);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, ff).commit();
             }
         } else {
             if (!pref.equals("favourite"))
