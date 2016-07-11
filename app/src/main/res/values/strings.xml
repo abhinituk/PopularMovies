@@ -18,6 +18,9 @@
     <string name="trailer">Trailer:</string>
     <string name="share">Share</string>
 
+    <string name="sync_account_type">sunshine.com</string>
+    <string name="content_authority">com.sunshine.popularmovies</string>
+
     <string-array name="entries">
         <item>@string/label_popularity</item>
         <item>@string/label_top_rated</item>

@@ -84,7 +84,6 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onResume() {
         super.onResume();
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
 
@@ -95,7 +94,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
 //
 //    }
 
-    private void movieDataUpdate() {
+    void movieDataUpdate() {
         getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 

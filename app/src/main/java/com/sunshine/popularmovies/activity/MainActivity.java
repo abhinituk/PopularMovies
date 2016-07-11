@@ -15,6 +15,7 @@ import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.fragment.DetailFragment;
 import com.sunshine.popularmovies.fragment.FavouriteFragment;
 import com.sunshine.popularmovies.fragment.MovieFragment;
+import com.sunshine.popularmovies.sync.MovieSyncAdapter;
 
 public class MainActivity extends AppCompatActivity implements MovieFragment.Callback, FavouriteFragment.Callback {
 
@@ -22,73 +23,64 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
     private boolean mTwoPane;
     private String pref;
     private String newPref;
-    private String PREFERENCE="preference";
+    private String PREFERENCE = "preference";
     private static final String MOVIEFRAGMENT_TAG = "MF";
     private static final String DETAILFRAGMENT_TAG = "DF";
     private static final String FAVOURITEFRAGMENT_TAG = "FF";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Log.v(LOG_TAG, "On Create Called");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
         View view = findViewById(R.id.detail_container);
         mTwoPane = view != null && view.getVisibility() == View.VISIBLE;
-        Log.v(LOG_TAG, String.valueOf(mTwoPane));
 
         if (savedInstanceState == null) {
+            Log.v(LOG_TAG, "On Saved Instance Called");
             pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
             if (!pref.equals("favourite"))
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment(), MOVIEFRAGMENT_TAG).commit();
             else
                 getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment(), FAVOURITEFRAGMENT_TAG).commit();
-
-
         }
-        else
-        {
-            pref= savedInstanceState.getString(PREFERENCE);
-            newPref= PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
-            if (!pref.equals(newPref))
-            {
-                if (!newPref.equals("favourite"))
-                {
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment()).commit();
-                }
-                else
-                    getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment()).commit();
-            }
-            else
-            {
-                if (!newPref.equals("favourite"))
-                    getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
-                else
-                    getSupportFragmentManager().findFragmentByTag(FAVOURITEFRAGMENT_TAG);
-            }
-
+        if (savedInstanceState != null) {
+            pref = savedInstanceState.getString(PREFERENCE);
         }
         Stetho.initializeWithDefaults(this);
+        MovieSyncAdapter.initializeSyncAdapter(this);
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         newPref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
+        Log.v(LOG_TAG, "On Start Called");
+        Log.v(LOG_TAG, "New Preference: " + newPref);
+        Log.v(LOG_TAG, "Old Preference: " + pref);
+        //This case is only applicable when user installs the app for the first time
+        if (pref.equals("popular") && newPref.equals("popular"))
+        {
+            MovieFragment mf= (MovieFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+            mf.preferenceChanged();
 
-        if (!pref.equals(newPref))
-        {
-            if (!newPref.equals("favourite"))
-            {
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, new MovieFragment()).commit();
-            }
-            else
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment()).commit();
         }
-        else
-        {
-            if (!newPref.equals("favourite"))
+        if (!pref.equals(newPref)) {
+            Log.v(LOG_TAG, "Preference changed");
+            if (!newPref.equals("favourite")) {
+                Log.v(LOG_TAG, "Preference not changed to fav");
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,new MovieFragment(),MOVIEFRAGMENT_TAG).commit();
+            }
+            else {
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, new FavouriteFragment(), FAVOURITEFRAGMENT_TAG).commit();
+                Log.v(LOG_TAG, "Preference changed to fav");
+            }
+        } else {
+            Log.v(LOG_TAG, "Preference not changed");
+            if (!pref.equals("favourite"))
                 getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
             else
                 getSupportFragmentManager().findFragmentByTag(FAVOURITEFRAGMENT_TAG);
@@ -99,18 +91,38 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
 
     @Override
     protected void onResume() {
+        Log.v(LOG_TAG,"On Resume Called");
         super.onResume();
-        if (!pref.equals("favourite"))
-            getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+        newPref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
 
-        else
-            getSupportFragmentManager().findFragmentByTag(FAVOURITEFRAGMENT_TAG);
+        if (!pref.equals(newPref)) {
+            if (!newPref.equals("favourite")) {
+                MovieFragment mf= (MovieFragment) getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, mf).commit();
+                mf.preferenceChanged();
+            } else {
+                FavouriteFragment ff= (FavouriteFragment) getSupportFragmentManager().findFragmentByTag(FAVOURITEFRAGMENT_TAG);
+                getSupportFragmentManager().beginTransaction().replace(R.id.container,ff).commit();
+            }
+        } else {
+            if (!pref.equals("favourite"))
+                getSupportFragmentManager().findFragmentByTag(MOVIEFRAGMENT_TAG);
+            else
+                getSupportFragmentManager().findFragmentByTag(FAVOURITEFRAGMENT_TAG);
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putString(PREFERENCE,pref);
+        String pref = PreferenceManager.getDefaultSharedPreferences(this).getString("sort_by", "popular");
+        outState.putString(PREFERENCE, pref);
     }
 
     @Override
@@ -131,19 +143,16 @@ public class MainActivity extends AppCompatActivity implements MovieFragment.Cal
 
     @Override
     public void onItemSelected(Uri movieUri) {
-        if (mTwoPane)
-        {
-            Bundle args= new Bundle();
-            args.putParcelable("DETAIL",movieUri);
-            DetailFragment detailFragment= new DetailFragment();
+        if (mTwoPane) {
+            Bundle args = new Bundle();
+            args.putParcelable("DETAIL", movieUri);
+            DetailFragment detailFragment = new DetailFragment();
             detailFragment.setArguments(args);
 
-            getSupportFragmentManager().beginTransaction().replace(R.id.detail_container,detailFragment,DETAILFRAGMENT_TAG).commit();
-        }
-        else
-        {
+            getSupportFragmentManager().beginTransaction().replace(R.id.detail_container, detailFragment, DETAILFRAGMENT_TAG).commit();
+        } else {
             Intent intent = new Intent(this, DetailActivity.class)
-                        .setData(movieUri);
+                    .setData(movieUri);
             startActivity(intent);
         }
 

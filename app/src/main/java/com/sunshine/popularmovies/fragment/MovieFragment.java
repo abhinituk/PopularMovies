@@ -28,7 +28,7 @@ import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.activity.DetailActivity;
 import com.sunshine.popularmovies.adapter.CustomMovieAdapter;
 import com.sunshine.popularmovies.data.MovieContract;
-import com.sunshine.popularmovies.network.FetchMovieTask;
+import com.sunshine.popularmovies.sync.MovieSyncAdapter;
 
 
 public class MovieFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
@@ -91,11 +91,18 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     }
 
 
-    private void movieDataUpdate() {
-        FetchMovieTask fetchMovieTask = new FetchMovieTask(getActivity());
+    void movieDataUpdate() {
         String pref = PreferenceManager.getDefaultSharedPreferences(getActivity()).getString("sort_by", "popular");
         if (!pref.equals("favourite"))
-            fetchMovieTask.execute(pref);
+        {
+            MovieSyncAdapter.syncImmediately(getContext());
+        }
+    }
+
+    public void preferenceChanged()
+    {
+        movieDataUpdate();
+//        getLoaderManager().restartLoader(LOADER_ID,null,this);
     }
 
 
@@ -164,6 +171,8 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                     null);
         else return null;
     }
+
+
 
 
     @Override

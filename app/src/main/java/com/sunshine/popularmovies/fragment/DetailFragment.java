@@ -265,6 +265,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
                         if (cursor.moveToFirst()) {
                             favourite = cursor.getInt(COL_FAVOURITE);
+                            String posterPath= cursor.getString(COL_POSTER_PATH);
+                            int movieId= cursor.getInt(COL_MOVIE_ID);
                             if (favourite == 0) {
                                 ContentValues cv = new ContentValues();
                                 cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 1);

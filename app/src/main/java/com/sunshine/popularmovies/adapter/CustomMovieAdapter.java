@@ -34,10 +34,10 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     }
 
 
-    public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch,int position) {
+    public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch, int position) {
         this.mContext = context;
         this.mCustomMovieAdapterOnClickHandler = ch;
-        this.mSelectedPosition=position;
+        this.mSelectedPosition = position;
     }
 
     public void swapCursor(Cursor data) {
