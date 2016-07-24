@@ -1,8 +1,12 @@
 package com.sunshine.popularmovies.utility;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Environment;
 import android.preference.PreferenceManager;
+import android.util.Log;
+
+import com.sunshine.popularmovies.data.MovieContract;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
@@ -13,6 +17,7 @@ import java.net.URL;
 
 public class Utility {
 
+    private final String LOG_TAG = getClass().getSimpleName();
     private static int COL_REVIEW_ID = 0;
     private static int COL_REVIEW_MOVIE_ID = 1;
     private static int COL_REVIEW_AUTHOR = 2;
@@ -51,18 +56,49 @@ public class Utility {
             String returnPath = Environment.getExternalStorageDirectory() + "/Images/" + path;
 
             directory = new File(directory, path);
-            directory.createNewFile();
-            FileOutputStream outputStream = new FileOutputStream(directory);
-            outputStream.write(response);
-            outputStream.close();
+            if (directory.exists()) {
+                Log.v("Images", "Image Exist");
+                return returnPath;
 
-            return returnPath;
+            } else {
+                directory.createNewFile();
+                FileOutputStream outputStream = new FileOutputStream(directory);
+                outputStream.write(response);
+                outputStream.close();
+                Log.v("Images Download", "Images does not exist, so download");
+
+                return returnPath;
+
+            }
 
         } catch (java.io.IOException e) {
             e.printStackTrace();
-        } finally {
-
         }
         return null;
     }
+
+
+    //This tells whether movie is marked as favourite or not
+    public static boolean getFavouriteStatus(int movieId, Context context) {
+        //movie.movie_id=?
+        final String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
+        boolean favouriteMarked = false;
+        int favourite;
+
+        Cursor cursor = context.getContentResolver().query(MovieContract.MovieEntry.CONTENT_URI,
+                new String[]{MovieContract.MovieEntry.COLUMN_MOVIE_ID, MovieContract.MovieEntry.COLUMN_FAVOURITE},
+                movieWithMovieId,
+                new String[]{String.valueOf(movieId)},
+                null);
+        assert cursor != null;
+        if (cursor.moveToFirst()) {
+            favourite = cursor.getInt(cursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_FAVOURITE));
+            favouriteMarked = favourite == 1;
+
+        }
+        cursor.close();
+        return favouriteMarked;
+    }
+
+
 }

@@ -67,6 +67,9 @@ public class MovieContract {
         //favourite
         public static final String COLUMN_FAVOURITE="favourite";
 
+        //favourite file path
+        public static final String COLUMN_FILE_PATH="file_path";
+
         //flag used for knowing whether movie is top rated or popular
         public static final String COLUMN_FLAG="flag";
 

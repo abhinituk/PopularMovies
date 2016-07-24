@@ -131,6 +131,7 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
         final String TMDB_VOTE_COUNT = "vote_count";
         final String TMDB_VOTE_AVERAGE = "vote_average";
         final String TMDB_BACKDROP_PATH="backdrop_path";
+        String movieWithMovieId = MovieContract.MovieEntry.COLUMN_MOVIE_ID + "=?";
 
 
         if (movieJsonStr != null) {
@@ -146,7 +147,6 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     int movieId = movieData.getInt(MOVIE_ID);
 
                     String poster_path= Utility.storeImages(movieId,path);
-                    Log.v("Path",poster_path);
 
 
                     String overview = movieData.getString(TMDB_OVERVIEW);
@@ -168,7 +168,11 @@ public class MovieSyncAdapter extends AbstractThreadedSyncAdapter {
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_ID, movieId);
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_POPULARITY, popularity);
                     movieValues.put(MovieContract.MovieEntry.COLUMN_MOVIE_VOTE_COUNT, vote_count);
-                    movieValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE,0);
+                    boolean favouriteMarked =  Utility.getFavouriteStatus(movieId,getContext());
+                    if (favouriteMarked)
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE,1);
+                    else
+                        movieValues.put(MovieContract.MovieEntry.COLUMN_FAVOURITE,0);
                     if(pref.equals("popular"))
                         movieValues.put(MovieContract.MovieEntry.COLUMN_FLAG,"popular");
                     else if (pref.equals("top_rated"))

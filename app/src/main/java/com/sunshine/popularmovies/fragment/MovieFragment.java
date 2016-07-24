@@ -20,7 +20,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -46,7 +45,8 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             , MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_FLAG,
             MovieContract.MovieEntry.COLUMN_FAVOURITE,
-            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE};
+            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.MovieEntry.COLUMN_FILE_PATH};
 
     public interface Callback {
         /**
@@ -70,20 +70,6 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
         inflater.inflate(R.menu.moviefragment, menu);
         super.onCreateOptionsMenu(menu, inflater);
     }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.refresh) {
-            movieDataUpdate();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-
-
-
     @Override
     public void onResume() {
         super.onResume();
@@ -115,6 +101,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
             mPosition= savedInstanceState.getInt(POSITION);
         }
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View emptyView = rootView.findViewById(R.id.emptyView);
 
         //Implementing the toolbar
         final Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
@@ -124,6 +111,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
 
 
         mRecycledGridView = (RecyclerView) rootView.findViewById(R.id.recycled_grid_view);
+
         mRecycledGridView.setHasFixedSize(true);
         mLayoutManager = new GridLayoutManager(getContext(), 2);
         mRecycledGridView.setLayoutManager(mLayoutManager);
@@ -135,7 +123,7 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
                 mPosition= vh.getLayoutPosition();
             }
 
-        },mPosition);
+        },emptyView);
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
         return rootView;
     }
@@ -186,5 +174,4 @@ public class MovieFragment extends Fragment implements LoaderManager.LoaderCallb
     public void onLoaderReset(Loader<Cursor> loader) {
         mCustomMovieAdapter.swapCursor(null);
     }
-
 }

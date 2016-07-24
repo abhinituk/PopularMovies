@@ -33,5 +33,13 @@
         android:layout_height="wrap_content"
         android:scrollbars="vertical" />
 
+    <TextView
+        android:id="@+id/emptyView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="center_horizontal"
+        android:padding="@dimen/empty_view_padding"
+        android:text="@string/no_movie_data_available"/>
+
 
 </LinearLayout>

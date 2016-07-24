@@ -265,8 +265,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
                         if (cursor.moveToFirst()) {
                             favourite = cursor.getInt(COL_FAVOURITE);
-                            String posterPath= cursor.getString(COL_POSTER_PATH);
-                            int movieId= cursor.getInt(COL_MOVIE_ID);
                             if (favourite == 0) {
                                 ContentValues cv = new ContentValues();
                                 cv.put(MovieContract.MovieEntry.COLUMN_FAVOURITE, 1);
@@ -274,6 +272,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                                         cv,
                                         movieWithMovieId,
                                         new String[]{String.valueOf(mMovieId)});
+                                if(getView()!=null)
                                 Snackbar.make(getView(), "Movie Added As Favourite", Snackbar.LENGTH_LONG).show();
 
                             } else {
@@ -283,6 +282,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                                         cv,
                                         movieWithMovieId,
                                         new String[]{String.valueOf(mMovieId)});
+                                if(getView()!=null)
                                 Snackbar.make(getView(), "Movie Removed From Favorite", Snackbar.LENGTH_LONG).show();
 
                             }
@@ -388,11 +388,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .error(R.drawable.placeholder_error)
                         .placeholder(R.drawable.placeholder)
                         .into(poster);
-                String overviewTitle = "Overview: " + "\n" + overview;
-                String releaseDateText = "Release Date: " + release_date;
-                String voteAvgText = "Vote Average: " + vote_average;
-                String voteCountText = "Vote Count: " + vote_count;
-                String popularityTextContent = "Popularity: " + popularity;
+                String overviewTitle = getString(R.string.overview) + "\n" + overview;
+                String releaseDateText = getString(R.string.release_date) + release_date;
+                String voteAvgText = getString(R.string.vote_avg) + vote_average;
+                String voteCountText = getString(R.string.vote_count) + vote_count;
+                String popularityTextContent = getString(R.string.popularity_text) + popularity;
 
                 releaseDate.setText(releaseDateText);
                 voteAvg.setText(voteAvgText);

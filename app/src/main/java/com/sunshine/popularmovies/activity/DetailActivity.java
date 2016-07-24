@@ -1,12 +1,10 @@
 package com.sunshine.popularmovies.activity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 
 import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.fragment.DetailFragment;
@@ -39,19 +37,6 @@ public class DetailActivity extends AppCompatActivity  {
         return super.onCreateOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        Log.v("Settings clicked ", String.valueOf(id));
-
-        if (id == R.id.action_settings_detail) {
-            startActivity(new Intent(this, SettingsActivity.class));
-            Log.v("Entered","true");
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
 
 
 

@@ -2,7 +2,6 @@ package com.sunshine.popularmovies.adapter;
 
 import android.content.Context;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -24,6 +23,7 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     final private Context mContext;
     final private CustomMovieAdapterOnClickHandler mCustomMovieAdapterOnClickHandler;
     private int mSelectedPosition;
+    View mEmptyView;
 
     @Override
     public int getItemCount() {
@@ -34,15 +34,16 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     }
 
 
-    public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch, int position) {
-        this.mContext = context;
-        this.mCustomMovieAdapterOnClickHandler = ch;
-        this.mSelectedPosition = position;
+    public CustomMovieAdapter(Context context, CustomMovieAdapterOnClickHandler ch, View emptyView) {
+        mContext = context;
+        mCustomMovieAdapterOnClickHandler = ch;
+        mEmptyView = emptyView;
     }
 
     public void swapCursor(Cursor data) {
         mCursor = data;
         notifyDataSetChanged();
+        mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 
     public Cursor getCursor() {
@@ -58,11 +59,9 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
         ViewHolder(View view) {
             super(view);
             mView = view;
-
             cardView = (CardView) view.findViewById(R.id.grid_item_cardView);
             poster = (ImageView) view.findViewById(R.id.grid_item_imageview);
             titleTextView = (TextView) view.findViewById(R.id.grid_item_title_textView);
-
             view.setOnClickListener(this);
         }
 
@@ -72,13 +71,6 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
             mCursor.moveToPosition(adapterPosition);
             int movieId = mCursor.getInt(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_ID));
             mCustomMovieAdapterOnClickHandler.onClick(movieId, this);
-            // Update the selected state for the old position
-            notifyItemChanged(mSelectedPosition);
-
-            mSelectedPosition = getLayoutPosition();
-
-            // Updating the selected state for the new position
-            notifyItemChanged(mSelectedPosition);
         }
     }
 
@@ -97,7 +89,7 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     public void onBindViewHolder(ViewHolder holder, int position) {
         mCursor.moveToPosition(position);
         String path = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH));
-        String title=mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE));
+        String title = mCursor.getString(mCursor.getColumnIndex(MovieContract.MovieEntry.COLUMN_MOVIE_TITLE));
         Picasso.with(mContext)
                 .load(new File(path))
                 .placeholder(R.drawable.placeholder)
@@ -105,11 +97,5 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
                 .into(holder.poster);
 
         holder.titleTextView.setText(title);
-        if (mSelectedPosition == position) {
-            holder.itemView.setBackgroundColor(mContext.getResources().getColor(R.color.gridSelectedColor));
-        }
-        else{
-            holder.itemView.setBackgroundColor(Color.parseColor("#ffffff"));
-        }
     }
 }

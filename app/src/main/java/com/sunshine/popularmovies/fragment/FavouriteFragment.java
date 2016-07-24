@@ -18,7 +18,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -45,7 +44,9 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
             , MovieContract.MovieEntry.COLUMN_MOVIE_ID,
             MovieContract.MovieEntry.COLUMN_FLAG,
             MovieContract.MovieEntry.COLUMN_FAVOURITE,
-            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE};
+            MovieContract.MovieEntry.COLUMN_MOVIE_TITLE,
+            MovieContract.MovieEntry.COLUMN_FILE_PATH
+    };
 
 
     public interface Callback {
@@ -70,32 +71,10 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         super.onCreateOptionsMenu(menu, inflater);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.refresh) {
-            movieDataUpdate();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
 
     @Override
     public void onResume() {
         super.onResume();
-    }
-
-
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        movieDataUpdate();
-//
-//    }
-
-    void movieDataUpdate() {
-        getLoaderManager().restartLoader(LOADER_ID, null, this);
     }
 
 
@@ -108,6 +87,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
             mPosition= savedInstanceState.getInt(POSITION);
         }
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View emptyView =  rootView.findViewById(R.id.emptyView);
 
         //Implementing the toolbar
         final Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
@@ -125,10 +105,10 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
             public void onClick(int movieId, CustomMovieAdapter.ViewHolder vh) {
                 Log.v("Uri", String.valueOf(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId)));
                 ((Callback) getActivity()).onItemSelected(MovieContract.MovieEntry.buildMovieWithMovieIdUri(movieId));
-                mPosition=vh.getLayoutPosition();
+                mPosition = vh.getLayoutPosition();
             }
 
-        },mPosition);
+        },emptyView);
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
 
         return rootView;
