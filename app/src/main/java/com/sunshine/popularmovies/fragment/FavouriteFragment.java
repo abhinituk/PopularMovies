@@ -20,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.sunshine.popularmovies.R;
 import com.sunshine.popularmovies.activity.DetailActivity;
@@ -31,13 +32,13 @@ import com.sunshine.popularmovies.data.MovieContract;
  */
 public class FavouriteFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private final String LOG_TAG= getClass().getSimpleName();
+    private final String LOG_TAG = getClass().getSimpleName();
     private CustomMovieAdapter mCustomMovieAdapter;
     private static final int LOADER_ID = 0;
     private static RecyclerView mRecycledGridView;
     private RecyclerView.LayoutManager mLayoutManager;
     private int mPosition;
-    private final String POSITION="position";
+    private final String POSITION = "position";
 
     private static final String[] MOVIE_COLUMN = {MovieContract.MovieEntry._ID
             , MovieContract.MovieEntry.COLUMN_MOVIE_POSTER_PATH
@@ -82,12 +83,11 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (savedInstanceState!=null && savedInstanceState.containsKey(POSITION))
-        {
-            mPosition= savedInstanceState.getInt(POSITION);
+        if (savedInstanceState != null && savedInstanceState.containsKey(POSITION)) {
+            mPosition = savedInstanceState.getInt(POSITION);
         }
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
-        View emptyView =  rootView.findViewById(R.id.emptyView);
+        View emptyView = rootView.findViewById(R.id.emptyView);
 
         //Implementing the toolbar
         final Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
@@ -108,7 +108,7 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
                 mPosition = vh.getLayoutPosition();
             }
 
-        },emptyView);
+        }, emptyView);
         mRecycledGridView.setAdapter(mCustomMovieAdapter);
 
         return rootView;
@@ -117,8 +117,8 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(POSITION,mPosition);
-        Log.v(LOG_TAG,mPosition+"saved");
+        outState.putInt(POSITION, mPosition);
+        Log.v(LOG_TAG, mPosition + "saved");
     }
 
     @Override
@@ -147,10 +147,20 @@ public class FavouriteFragment extends Fragment implements LoaderManager.LoaderC
         mCustomMovieAdapter.swapCursor(data);
         mRecycledGridView.getLayoutManager().scrollToPosition(mPosition);
         mCustomMovieAdapter.notifyItemChanged(mPosition);
+        updateEmptyView(data);
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         mCustomMovieAdapter.swapCursor(null);
+    }
+
+    public void updateEmptyView(Cursor cursor) {
+        if (cursor.getCount() == 0) {
+            TextView textView = (TextView) getView().findViewById(R.id.emptyView);
+            if (textView != null) {
+                textView.setText(getString(R.string.no_favourite_movie));
+            }
+        }
     }
 }

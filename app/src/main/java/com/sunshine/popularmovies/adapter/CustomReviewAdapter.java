@@ -19,13 +19,11 @@ import com.sunshine.popularmovies.data.MovieContract;
 public class CustomReviewAdapter extends RecyclerView.Adapter<CustomReviewAdapter.ViewHolder> {
     private final String LOG_TAG= getClass().getSimpleName();
 
-    String noReview = "No Review Available";
 
     private Cursor mCursor;
     private final Context mContext;
 
     public CustomReviewAdapter(Context context) {
-        super();
         mContext = context;
     }
 
@@ -44,10 +42,7 @@ public class CustomReviewAdapter extends RecyclerView.Adapter<CustomReviewAdapte
 
         String author = mCursor.getString(mCursor.getColumnIndex(MovieContract.ReviewEntry.COL_REVIEW_AUTHOR));
         String content = mCursor.getString(mCursor.getColumnIndex(MovieContract.ReviewEntry.COL_REVIEW_CONTENT));
-        int positionForView= position+1;
-        String positionUsed= "Review #"+positionForView+":\n"+author;
-
-        holder.authorTextView.setText(positionUsed);
+        holder.authorTextView.setText(author);
         holder.contentTextView.setText(content);
 
     }

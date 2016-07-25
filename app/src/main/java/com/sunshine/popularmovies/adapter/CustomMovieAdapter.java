@@ -43,6 +43,8 @@ public class CustomMovieAdapter extends RecyclerView.Adapter<CustomMovieAdapter.
     public void swapCursor(Cursor data) {
         mCursor = data;
         notifyDataSetChanged();
+
+        //It changes the visibility of emptyView depending on getItemCount
         mEmptyView.setVisibility(getItemCount() == 0 ? View.VISIBLE : View.GONE);
     }
 

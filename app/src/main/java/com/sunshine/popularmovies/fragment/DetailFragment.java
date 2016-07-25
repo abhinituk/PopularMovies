@@ -334,8 +334,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                     null);
         } else
             return null;
-
-
     }
 
     @Override
@@ -388,7 +386,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                         .error(R.drawable.placeholder_error)
                         .placeholder(R.drawable.placeholder)
                         .into(poster);
-                String overviewTitle = getString(R.string.overview) + "\n" + overview;
                 String releaseDateText = getString(R.string.release_date) + release_date;
                 String voteAvgText = getString(R.string.vote_avg) + vote_average;
                 String voteCountText = getString(R.string.vote_count) + vote_count;
@@ -398,7 +395,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 voteAvg.setText(voteAvgText);
                 voteCount.setText(voteCountText);
                 popularityText.setText(popularityTextContent);
-                overView.setText(overviewTitle);
+                overView.setText(overview);
 
 
                 break;
@@ -411,8 +408,6 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown Loader" + loader.getId());
-
-
         }
     }
 

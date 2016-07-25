@@ -22,14 +22,14 @@
     <string name="sync_account_type">sunshine.com</string>
     <string name="content_authority" translatable="false">com.sunshine.popularmovies</string>
 
-    <string name="no_internet_available">No Internet Available</string>
-    <string name="no_favourite_movie">Favourite Movie not Availbale.</string>
 
-    <string name="overview"><b>Overview:</b>\n</string>
+
     <string name="release_date">Release Date: </string>
     <string name="vote_avg">Vote Average: </string>
     <string name="vote_count">Vote Count: </string>
     <string name="popularity_text">Popularity: </string>
+    <string name="review">Review:</string>
+    <string name="overview_label">Overview:</string>
 
     <string-array name="entries">
         <item>@string/label_popularity</item>
@@ -44,6 +44,11 @@
         <item>@string/favourite</item>
     </string-array>
 
-
+    <!--These strings are used for emptyview-->
     <string name="no_movie_data_available">No Movie Information Available</string>
+    <string name="no_internet_available">No Movie Information Available.Check Your Internet Connection</string>
+    <string name="no_favourite_movie"> Favourite Collection is empty.</string>
+
+
+
 </resources>

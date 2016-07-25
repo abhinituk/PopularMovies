@@ -2,6 +2,8 @@ package com.sunshine.popularmovies.utility;
 
 import android.content.Context;
 import android.database.Cursor;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.util.Log;
@@ -100,5 +102,14 @@ public class Utility {
         return favouriteMarked;
     }
 
+    public static boolean getNetworkStatus(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting();
+
+    }
 
 }
